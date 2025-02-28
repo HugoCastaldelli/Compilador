@@ -3,6 +3,22 @@ const line_numbers = document.getElementById("line_numbers");
 const table_container = document.getElementById("table_container");
 const file_chooser = document.getElementById("file_chooser"); 
 
+
+document.getElementById("dowload_btn").addEventListener("click", function() {
+    var conteudo = document.getElementById("code_editor").innerText;
+    
+    var blob = new Blob([conteudo], { type: "text/plain;charset=utf-8" });
+    
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    link.download = "code.txt";
+    
+    link.click();
+    
+    URL.revokeObjectURL(link.href);
+});
+
 file_chooser.addEventListener("change", (event) => {
     const arquivo = event.target.files[0];
     if (arquivo) {
