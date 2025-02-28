@@ -74,21 +74,37 @@ function generateTableContent(code) {
     const tokens = {
         "if": "palavra reservada",
         "for": "palavra reservada",
-        "while": "palavra reservada"
-
+        "while": "palavra reservada",
+        ";": "final da linha"
     };
+
+    const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]*)$/;
+    const reg_int = /^(0|[1-9][0-9]*)$/;
+    const reg_float = /^([0-9]+\.[0-9]+)$/;
     
     const lines = code.split("\n");
     
     lines.forEach((line, lineIndex) => {
-        const words = line.split(/\s+/);
         let colStart = 0;
+        const words = line.match(/\d+\.\d+|\w+|\S/g) || [];
         
         words.forEach(word => {
             if (word.trim() !== "") {
-                const tokenType = tokens[word] || "variavel";
-                const colEnd = colStart + word.length - 1;
+                let tokenType;
+                if (tokens[word]) {
+                    tokenType = tokens[word];
+                } else if (reg_int.test(word)) {
+                    tokenType = "integer";
+                } else if (reg_float.test(word)) {
+                    tokenType = "float";
+                } else if (reg_var.test(word)) {
+                    tokenType = "variável";
+                } else {
+                    tokenType = "Erro";
+                    
+                }
                 
+                const colEnd = colStart + word.length - 1;
                 table_content.push([word, tokenType, lineIndex, colStart, colEnd]);
             }
             colStart += word.length + 1;
