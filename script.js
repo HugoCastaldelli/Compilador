@@ -34,7 +34,6 @@ editor.addEventListener("keydown", function(event) {
 });
 
 function create_table(){
-    const text = "oi 2 a";
     var new_table = document.createElement("table");
     document.getElementById("table_container").appendChild(new_table);
 }
@@ -58,13 +57,6 @@ function create_table(content) {
     table.appendChild(tbody);
     return table;
 }
-
-// const table_content = [
-//     ["Lexema", "Token", "Linha", "Coluna Inicio", "Coluna Fim"],
-//     ["oi", "variavel", 0, 0, 1],
-//     ["if", "palavra reservada", 1, 0, 1],
-//     ["oi", "variavel", 1, 3, 4] 
-// ]
 
 function generateTableContent(code) {
     const table_content = [
@@ -128,3 +120,17 @@ function analizador_lexico(){
 }
 
 
+document.getElementById("dowload_btn").addEventListener("click", function() {
+    var conteudo = document.getElementById("code_editor").innerText;
+    
+    var blob = new Blob([conteudo], { type: "text/plain;charset=utf-8" });
+    
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    link.download = "code.txt";
+    
+    link.click();
+    
+    URL.revokeObjectURL(link.href);
+});
