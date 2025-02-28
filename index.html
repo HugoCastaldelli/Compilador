@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilador Java</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Compilador Java</h2> 
+    <header>
+        <input type="file" accept=".txt" id="file_chooser">
+    </header>
+    
+
+    <div class="editor_container">
+        <div class="line_numbers" id="line_numbers">1</div>
+        <pre class="code_editor" contenteditable="true" id="code_editor"></pre>
+    </div>
+
+    <button type="button" onclick="analizador_lexico()" id = "btn">Lexico</button>
+
+    <div style="background-color: rgb(240, 172, 240);">
+
+        <div id="table_container"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
