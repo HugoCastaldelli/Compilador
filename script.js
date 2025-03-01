@@ -79,15 +79,31 @@ function generateTableContent(code) {
         ["Lexema", "Token", "Linha", "Coluna Inicio", "Coluna Fim"]
     ];
 
-    const reservedWords = ["if", "else", "while", "do", "for", "ifelse", "case", "break", "int", "float", "double", "string", "char", "continue"];
+    const reservedWords = ["if", "else", "while", "do", "for", "ifelse", "case", "break",
+                           "int", "float", "double", "string", "char", "continue"];
 
     const tokens = Object.fromEntries(
         reservedWords.map(word => [word, "reserved word"])
     );
 
     tokens[";"] = "end of line";
-    tokens["("] = "open brackets";
-    tokens[")"] = "close brackets";
+    tokens["("] = "open parentheses";
+    tokens[")"] = "close parentheses";
+    tokens["{"] = "open braces";
+    tokens["}"] = "close braces";
+    tokens["["] = "open brackets";
+    tokens["]"] = "close brackets";
+    tokens["\'"] = "apostrophe";
+    tokens["\""] = "quotation mark";
+
+    tokens["="] = "equal  to";
+    tokens["<>"] = "not equal  to";
+    tokens[">"] = "greater than";
+    tokens["<"] = "less than";
+    tokens[">="] = "equal or greater than";
+    tokens["<="] = "equal or less than";
+
+    tokens[":="] = "assignment";
     
     const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]*)$/;
     const reg_int = /^(0|[1-9][0-9]*)$/;
@@ -98,7 +114,7 @@ function generateTableContent(code) {
     
     lines.forEach((line, lineIndex) => {
         let colStart = 0;
-        const words = line.match(/\d+\.\d+|\w+|\S/g) || [];
+        const words = line.match(/>=|<=|<>|:=|\d+\.\d+|\w+|\S/g) || [];
         
         words.forEach(word => {
             if (word.trim() !== "") {
@@ -118,7 +134,7 @@ function generateTableContent(code) {
                 }
                 
                 const colEnd = colStart + word.length - 1;
-                table_content.push([word, tokenType, lineIndex, colStart, colEnd]);
+                table_content.push([word, tokenType, lineIndex+1, colStart+1, colEnd+1]);
             }
             colStart += word.length + 1;
         });
