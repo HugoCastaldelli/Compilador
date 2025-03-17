@@ -79,23 +79,20 @@ function generateTableContent(code) {
         ["Lexema", "Token", "Linha", "Coluna Inicio", "Coluna Fim"]
     ];
 
-    const reservedWords = ["if", "else", "while", "do", "for", "ifelse", "case", "break",
-                           "int", "float", "double", "string", "char", "continue"];
+    const reservedWords = ["program", "procedure", "var", "int", "boolean", "read", "write", "true", "false", 
+                           "begin", "end", "if", "then", "else", "while", "do", "or", "and", "not"];
 
-    const tokens = Object.fromEntries(
-        reservedWords.map(word => [word, "reserved word"])
-    );
+    const tokens = {};
+
+    reservedWords.forEach(word => {
+    tokens[word] = `reserved word ${word}`;
+    });
 
     tokens[";"] = "end of line";
+
     tokens["("] = "open parentheses";
     tokens[")"] = "close parentheses";
-    tokens["{"] = "open braces";
-    tokens["}"] = "close braces";
-    tokens["["] = "open brackets";
-    tokens["]"] = "close brackets";
-    tokens["\'"] = "apostrophe";
-    tokens["\""] = "quotation mark";
-
+ 
     tokens["="] = "equal  to";
     tokens["<>"] = "not equal  to";
     tokens[">"] = "greater than";
@@ -104,7 +101,11 @@ function generateTableContent(code) {
     tokens["<="] = "equal or less than";
 
     tokens[":="] = "assignment";
-    
+
+    tokens["//"] = "comment line"
+    tokens["{"] = "comment area begin";
+    tokens["}"] = "comment area end";
+
     const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]*)$/;
     const reg_int = /^(0|[1-9][0-9]*)$/;
     const reg_float = /^([0-9]+\.[0-9]+)$/;
@@ -114,7 +115,7 @@ function generateTableContent(code) {
     
     lines.forEach((line, lineIndex) => {
         let colStart = 0;
-        const words = line.match(/>=|<=|<>|:=|\d+\.\d+|\w+|\S/g) || [];
+        const words = line.match(/>=|<=|<>|:=|s\d+\.\d+|\w+|\S/g) || [];
         
         words.forEach(word => {
             if (word.trim() !== "") {
@@ -126,7 +127,7 @@ function generateTableContent(code) {
                 } else if (reg_float.test(word)) {
                     tokenType = "float";
                 } else if (reg_var.test(word)) {
-                    tokenType = "variável";
+                    tokenType = "variable";
                 } else if(operator.test(word)){
                     tokenType = "operator";   
                 } else{
