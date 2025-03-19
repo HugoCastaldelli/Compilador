@@ -145,7 +145,23 @@ function generateTableContent(code) {
 }
 
 function analizador_lexico(){
-    const code = editor.innerText;
+    let code = editor.innerText;
+    debugger;
+    let code_length = code.length;
+    let i = 0;
+    while(i <= code.length){
+        while (i <= code_length && !(code[i] === "/" && code[i+1] === "/")){
+            i++;
+        };
+        let comment_start_index = i;
+        while (i <= code_length && code[i] != "\n"){
+            i++;
+        }
+        let comment_end_index = i;
+        code = code.slice(0,comment_start_index) + code.slice(comment_end_index,code_length);
+        i = i - (comment_end_index - comment_start_index);
+    } 
+    
     const table_content = generateTableContent(code);
     table_container.innerText = "";
     table_container.appendChild(create_table(table_content));
