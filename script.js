@@ -101,11 +101,7 @@ function generateTableContent(code) {
     tokens["<="] = "equal or less than";
 
     tokens[":="] = "assignment";
-
-    tokens["//"] = "comment line"
-    tokens["{"] = "comment area begin";
-    tokens["}"] = "comment area end";
-
+    
     const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]*)$/;
     const reg_int = /^(0|[1-9][0-9]*)$/;
     const reg_float = /^([0-9]+\.[0-9]+)$/;
@@ -146,8 +142,15 @@ function generateTableContent(code) {
 
 function analizador_lexico(){
     let code = editor.innerText;
-    debugger;
+    
+    let endComment_index, startComment_index = code.indexOf("{")
+    if(startComment_index){
+        endComment_index = code.lastIndexOf("}")
+    }
+    if(endComment_index){code = code.slice(0,startComment_index) + code.slice(endComment_index,code_length);}
+    
     let code_length = code.length;
+    
     let i = 0;
     while(i <= code.length){
         while (i <= code_length && !(code[i] === "/" && code[i+1] === "/")){
