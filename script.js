@@ -142,14 +142,13 @@ function generateTableContent(code) {
 
 function analizador_lexico(){
     let code = editor.innerText;
+    let code_length = code.length;
     
     let endComment_index, startComment_index = code.indexOf("{")
     if(startComment_index){
         endComment_index = code.lastIndexOf("}")
     }
     if(endComment_index){code = code.slice(0,startComment_index) + code.slice(endComment_index,code_length);}
-    
-    let code_length = code.length;
     
     let i = 0;
     while(i <= code.length){
