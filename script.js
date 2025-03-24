@@ -109,11 +109,7 @@ function generateTableContent(code) {
     tokens["<="] = "equal or less than";
 
     tokens[":="] = "assignment";
-
-    tokens["//"] = "comment line"
-    tokens["{"] = "comment area begin";
-    tokens["}"] = "comment area end";
-
+    
     const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]*)$/;
     const reg_int = /^(0|[1-9][0-9]*)$/;
     const reg_float = /^([0-9]+\.[0-9]+)$/;
