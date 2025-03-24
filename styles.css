@@ -86,3 +86,7 @@ header {
     width: 80%;
     margin-bottom: 10px;
 }
+
+.error_line {
+    background-color: rgba(255, 66, 66, 0.425);
+}

@@ -57,8 +57,8 @@ function create_table(){
 function create_table(content) {
     var table = document.createElement("table");
     var thead = document.createElement("thead");
-    var tbody=document.createElement("tbody");
-    var thd=function(i){return (i==0)?"th":"td";};
+    var tbody = document.createElement("tbody");
+    var thd = function(i){return (i==0)?"th":"td";};
     for (var i=0;i<content.length;i++) {
       var tr = document.createElement("tr");
       for(var j=0;j<content[i].length;j++){
@@ -66,6 +66,10 @@ function create_table(content) {
         var texto=document.createTextNode(content[i][j]);
         t.appendChild(texto);
         tr.appendChild(t);
+
+        if(content[i][1] === "Error"){
+            tr.setAttribute("class","error_line");
+        }
       }
       (i==0)?thead.appendChild(tr):tbody.appendChild(tr);
     }
@@ -89,6 +93,10 @@ function generateTableContent(code) {
     });
 
     tokens[";"] = "end of line";
+
+    tokens[","] = "comma";
+
+    tokens["."] = "and of program";
 
     tokens["("] = "open parentheses";
     tokens[")"] = "close parentheses";
@@ -115,7 +123,7 @@ function generateTableContent(code) {
     
     lines.forEach((line, lineIndex) => {
         let colStart = 0;
-        const words = line.match(/>=|<=|<>|:=|s\d+\.\d+|\w+|\S/g) || [];
+        const words = line.match(/>=|<=|<>|:=|\/\/|s\d+\.\d+|\w+|\S/g) || [];
         
         words.forEach(word => {
             if (word.trim() !== "") {
@@ -136,6 +144,7 @@ function generateTableContent(code) {
                 
                 const colEnd = colStart + word.length - 1;
                 table_content.push([word, tokenType, lineIndex+1, colStart+1, colEnd+1]);
+                
             }
             colStart += word.length + 1;
         });
