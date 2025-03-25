@@ -5,7 +5,7 @@ const file_chooser = document.getElementById("file_chooser");
 
 
 document.getElementById("dowload_btn").addEventListener("click", function() {
-    var conteudo = document.getElementById("code_editor").innerText;
+    var conteudo = editor.innerText;
     
     var blob = new Blob([conteudo], { type: "text/plain;charset=utf-8" });
     
@@ -25,7 +25,7 @@ file_chooser.addEventListener("change", (event) => {
         const leitor = new FileReader();
         leitor.onload = function(e) {
           const conteudo = e.target.result;
-          document.getElementById('code_editor').textContent = conteudo;
+          editor.textContent = conteudo;
         };
         leitor.readAsText(arquivo);
         
@@ -116,7 +116,7 @@ function generateTableContent(code) {
     const operator = /^(\+|\-|\*|\/)$/;
     
     const lines = code.split("\n");
-    
+
     lines.forEach((line, lineIndex) => {
         let colStart = 0;
         const words = line.match(/>=|<=|<>|:=|\/\/|s\d+\.\d+|\w+|\S/g) || [];
@@ -151,36 +151,54 @@ function generateTableContent(code) {
 
 function analizador_lexico(){
     let code = editor.innerText;
-    let code_length = code.length;
-    
-    let endComment_index, startComment_index = code.indexOf("{")
-    if(startComment_index){
-        endComment_index = code.lastIndexOf("}")
-    }
-    if(endComment_index){code = code.slice(0,startComment_index) + code.slice(endComment_index,code_length);}
-    
+    let j = 0;
+
+    while(j <= code.length){
+        if (code[j] === "}"){
+            j++;
+        }
+        while (j <= code.length && code[j] != "{"){
+            j++;
+        };
+        let commentStart_index = j;
+        while (j <= code.length && code[j] != "}"){
+            j++;
+        }
+        let commentEnd_index = j;
+
+        if (j > code.length){
+            break;
+        }
+        code = code.slice(0,commentStart_index) + code.slice(commentEnd_index+1,code.length);
+        j = j - (commentEnd_index - commentStart_index);
+    } 
     let i = 0;
     while(i <= code.length){
-        while (i <= code_length && !(code[i] === "/" && code[i+1] === "/")){
+        while (i <= code.length && !(code[i] === "/" && code[i+1] === "/")){
             i++;
         };
         let comment_start_index = i;
-        while (i <= code_length && code[i] != "\n"){
+        while (i <= code.length && code[i] != "\n"){
             i++;
         }
         let comment_end_index = i;
-        code = code.slice(0,comment_start_index) + code.slice(comment_end_index,code_length);
+        code = code.slice(0,comment_start_index) + code.slice(comment_end_index+1,code.length);
         i = i - (comment_end_index - comment_start_index);
     } 
     
     const table_content = generateTableContent(code);
     table_container.innerText = "";
     table_container.appendChild(create_table(table_content));
-    
+
+
+    // code = "<span>" + code +"</span>";
+    // editor.innerHTML = code;
+    // console.log(editor.innerText);
+    // console.log(editor.innerHTML);
 }
 
 document.getElementById("dowload_btn").addEventListener("click", function() {
-    var conteudo = document.getElementById("code_editor").innerText;
+    var conteudo = editor.innerText;
     
     var blob = new Blob([conteudo], { type: "text/plain;charset=utf-8" });
     
