@@ -89,63 +89,73 @@ function generateTableContent(code) {
     const tokens = {};
 
     reservedWords.forEach(word => {
-    tokens[word] = `reserved word ${word}`;
+        tokens[word] = `reserved word ${word}`;
     });
 
     tokens[";"] = "end of line";
-
     tokens[","] = "comma";
-
     tokens["."] = "and of program";
-
     tokens["("] = "open parentheses";
     tokens[")"] = "close parentheses";
- 
-    tokens["="] = "equal  to";
-    tokens["<>"] = "not equal  to";
+    tokens["="] = "equal to";
+    tokens["<>"] = "not equal to";
     tokens[">"] = "greater than";
     tokens["<"] = "less than";
     tokens[">="] = "equal or greater than";
     tokens["<="] = "equal or less than";
-
     tokens[":="] = "assignment";
     
     const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]*)$/;
     const reg_int = /^(0|[1-9][0-9]*)$/;
     const reg_float = /^([0-9]+\.[0-9]+)$/;
-    const operator = /^(\+|\-|\*|\/)$/;
+    const operator = /^([+\-*/])$/;
     
     const lines = code.split("\n");
+    let code_html = "";
 
     lines.forEach((line, lineIndex) => {
         let colStart = 0;
-        const words = line.match(/>=|<=|<>|:=|\/\/|s\d+\.\d+|\w+|\S/g) || [];
+        let formattedLine = "";
+        const words = line.match(/>=|<=|<>|:=|\/\/|\d+\.\d+|\w+|\S/g) || [];
         
+        let lastIndex = 0;
         words.forEach(word => {
             if (word.trim() !== "") {
                 let tokenType;
+                let spanClass = "";
                 if (tokens[word]) {
                     tokenType = tokens[word];
+                    spanClass = "reserved_word";
                 } else if (reg_int.test(word)) {
                     tokenType = "integer";
-                } else if (reg_float.test(word)) {
-                    tokenType = "float";
+                    spanClass = "number";
                 } else if (reg_var.test(word)) {
                     tokenType = "variable";
-                } else if(operator.test(word)){
-                    tokenType = "operator";   
-                } else{
-                    tokenType = "Error"
+                    spanClass = "variable";
+                } else if (operator.test(word)) {
+                    tokenType = "operator";
+                    spanClass = "operator";
+                } else {
+                    tokenType = "Error";
+                    spanClass = "error";
                 }
                 
-                const colEnd = colStart + word.length - 1;
-                table_content.push([word, tokenType, lineIndex+1, colStart+1, colEnd+1]);
+                const wordIndex = line.indexOf(word, lastIndex);
+                formattedLine += line.substring(lastIndex, wordIndex);
+                formattedLine += `<span class="${spanClass}" spellcheck="false">${word}</span>`;
+                lastIndex = wordIndex + word.length;
                 
+                const colEnd = colStart + word.length - 1;
+                table_content.push([word, tokenType, lineIndex + 1, colStart + 1, colEnd + 1]);
             }
             colStart += word.length + 1;
         });
+        
+        formattedLine += line.substring(lastIndex); // Adiciona qualquer espaço em branco restante
+        code_html += formattedLine + "\n"; // Mantém a quebra de linha original
     });
-    
+
+    editor.innerHTML = code_html;
     return table_content;
 }
 
@@ -191,7 +201,7 @@ function analizador_lexico(){
     table_container.appendChild(create_table(table_content));
 
 
-    // code = "<span>" + code +"</span>";
+    // code = "<span class=\"error\">" + code +"</span>";
     // editor.innerHTML = code;
     // console.log(editor.innerText);
     // console.log(editor.innerHTML);
