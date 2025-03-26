@@ -94,7 +94,9 @@ function generateTableContent(code) {
 
     tokens[";"] = "end of line";
     tokens[","] = "comma";
-    tokens["."] = "and of program";
+
+    tokens["."] = "End of program";
+  
     tokens["("] = "open parentheses";
     tokens[")"] = "close parentheses";
     tokens["="] = "equal to";
@@ -104,9 +106,10 @@ function generateTableContent(code) {
     tokens[">="] = "equal or greater than";
     tokens["<="] = "equal or less than";
     tokens[":="] = "assignment";
+    tokens[":"] = "vartype";
     
-    const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]*)$/;
-    const reg_int = /^(0|[1-9][0-9]*)$/;
+    const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]{0,24})$/;
+    const reg_int = /^(0|[1-9][0-9]{0,24})$/;
     const reg_float = /^([0-9]+\.[0-9]+)$/;
     const operator = /^([+\-*/])$/;
     
