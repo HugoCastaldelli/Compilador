@@ -103,15 +103,15 @@ span {
 }
 
 .reserved_word{
-    color: #773b6f;
+    color: #e7c1d9;
 }
 
 .number{
-    color: #2e6a4d;
+    color: #afdfb7;
 }
 
 .variable{
-    color: #78aef1;
+    color: #a7bfec;
 }
 
 .comment{
@@ -119,8 +119,8 @@ span {
 }
 
 .error{
-    color: #ff0000;
+    color: #ce4b4b;
     text-decoration: underline;
-    text-decoration-color: red;
+    text-decoration-color: #ce4b4b;
     text-decoration-style: wavy;
 }
