@@ -84,8 +84,6 @@ function Criar_tabela_lexemas(table){
     Syntatic_table.forEach((value,index) => {
         Syntatic_table[index] = Syntatic_table[index].slice(0,2);
     });
-
-    console.log(Syntatic_table)
 }
 
 function generateTableContent(code) {
