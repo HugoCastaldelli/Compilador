@@ -180,6 +180,7 @@ function analizador_lexico(){
         let commentEnd_index = j;
 
         if (j > code.length){
+            code = code.slice(0,commentStart_index)
             break;
         }
         code = code.slice(0,commentStart_index) + code.slice(commentEnd_index+1,code.length);
