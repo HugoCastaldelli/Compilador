@@ -213,11 +213,5 @@ function analizador_lexico(){
     const table_content = generateTableContent(code);
     table_container.innerText = "";
     table_container.appendChild(create_table(table_content));
-
-
-    // code = "<span class=\"error\">" + code +"</span>";
-    // editor.innerHTML = code;
-    // console.log(editor.innerText);
-    // console.log(editor.innerHTML);
 }
 

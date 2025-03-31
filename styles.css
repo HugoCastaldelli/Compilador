@@ -118,9 +118,14 @@ span {
     color: #5ddc7d;
 }
 
+.operator{
+    color:white;
+}
+
 .error{
     color: #ce4b4b;
     text-decoration: underline;
     text-decoration-color: #ce4b4b;
     text-decoration-style: wavy;
 }
+
