@@ -2,7 +2,7 @@ const editor = document.getElementById("code_editor");
 const line_numbers = document.getElementById("line_numbers");
 const table_container = document.getElementById("table_container");
 const file_chooser = document.getElementById("file_chooser"); 
-
+let Syntatic_table;
 
 document.getElementById("dowload_btn").addEventListener("click", function() {
     var conteudo = editor.innerText;
@@ -76,6 +76,16 @@ function create_table(content) {
     table.appendChild(thead);
     table.appendChild(tbody);
     return table;
+}
+
+function Criar_tabela_lexemas(table){
+    Syntatic_table = [...table];
+    Syntatic_table.shift();
+    Syntatic_table.forEach((value,index) => {
+        Syntatic_table[index] = Syntatic_table[index].slice(0,2);
+    });
+
+    console.log(Syntatic_table)
 }
 
 function generateTableContent(code) {
@@ -159,8 +169,10 @@ function generateTableContent(code) {
     });
 
     editor.innerHTML = code_html;
+    Criar_tabela_lexemas(table_content)
     return table_content;
 }
+
 
 function analizador_lexico(){
     let code = editor.innerText;
@@ -211,17 +223,3 @@ function analizador_lexico(){
     // console.log(editor.innerHTML);
 }
 
-document.getElementById("dowload_btn").addEventListener("click", function() {
-    var conteudo = editor.innerText;
-    
-    var blob = new Blob([conteudo], { type: "text/plain;charset=utf-8" });
-    
-    var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    
-    link.download = "code.txt";
-    
-    link.click();
-    
-    URL.revokeObjectURL(link.href);
-});
