@@ -119,14 +119,14 @@ span {
 }
 
 .comment{
-    color: #a8a8a8;
+    color: #0bd136;
 }
 
 .operator{
     color:white;
 }
 
-.error{
+.error{ 
     color: #ce4b4b;
     text-decoration: underline;
     text-decoration-color: #ce4b4b;

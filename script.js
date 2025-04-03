@@ -167,12 +167,13 @@ function generateTokens(){
     tokens["<="] = "equal or less than";
     tokens[":="] = "assignment";
     tokens[":"] = "vartype";
-    tokens["{"] = "open comment";
-    tokens["}"] = "close comment";
+    // tokens["{"] = "open comment";
+    // tokens["}"] = "close comment";
     tokens["//"] = "comment line";
 
     return tokens;
 }
+
 function generateTableContent(code) {
     const table_content = [["Lexema", "Token", "Linha", "Coluna Inicio", "Coluna Fim"]];
 
@@ -184,17 +185,26 @@ function generateTableContent(code) {
     
     const lines = code.split("\n");
     let code_html = "";
+    let insideCommentBlock = false;
 
     lines.forEach((line, lineIndex) => {
         let colStart = 0;
         let formattedLine = "";
-        const words = line.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g) || [];
-        
+        const words = line.match(/>=|<=|<>|:=|\/\/.*|\{[^\}]*\}|\d+\.\d+|\w+|\S/g) || [];
+
         let lastIndex = 0;
         words.forEach(word => {
             if (word.trim() !== "") {
                 let tokenType;
                 let spanClass = "";
+
+                if (insideCommentBlock) {
+                    tokenType = "comment";
+                    spanClass = "comment";
+                    if (word.includes("}")) { 
+                        insideCommentBlock = false;
+                    }
+                }
                 if (tokens[word]) {
                     tokenType = tokens[word];
                     spanClass = "reserved_word";
@@ -207,14 +217,18 @@ function generateTableContent(code) {
                 } else if (operator.test(word)) {
                     tokenType = "operator";
                     spanClass = "operator";
-                } else if (!word.indexOf("//")) {
+                } else if (word.startsWith("//")) {
                     tokenType = "comment";
                     spanClass = "comment";
+                } else if ( word.startsWith("{")) {
+                    tokenType = "comment";
+                    spanClass = "comment";
+                    insideCommentBlock = true;
                 } else {
                     tokenType = "Error";
                     spanClass = "error";
                 }
-                
+                5+5 // m 
                 const wordIndex = line.indexOf(word, lastIndex);
                 formattedLine += line.substring(lastIndex, wordIndex);
                 formattedLine += `<span class="${spanClass}" spellcheck="false">${word}</span>`;
