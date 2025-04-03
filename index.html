@@ -9,7 +9,13 @@
 <body>
     <h2>Compilador</h2> 
     <header>
+        <label for="file_chooser" class="custom_btn">
+            Carregar arquivo
+        </label>
         <input type="file" accept=".txt" id="file_chooser">
+        <label for="dowload_btn" class="custom_btn">
+            Carregar arquivo
+        </label>
         <button id="dowload_btn">Baixar codigo</button>
     </header>
     
@@ -19,7 +25,10 @@
         <div class="code_editor" contenteditable="true" id="code_editor" spellcheck="false"></div>
     </div>
 
-    <button type="button" onclick="analizador_lexico()" id = "btn">Lexico</button>
+    <label for="lexico_btn" class="custom_btn">
+        Lexico
+    </label>
+    <button type="button" onclick="analizador_lexico()" id="lexico_btn">Lexico</button>
 
     
     <div id="table_container"></div>
