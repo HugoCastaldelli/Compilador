@@ -136,7 +136,7 @@ function create_table(content) {
     return table;
 }
 
-function Criar_tabela_lexemas(table){
+function criar_tabela_lexemas(table){
     Syntatic_table = [...table];
     Syntatic_table.shift();
     Syntatic_table.forEach((value,index) => {
@@ -190,12 +190,12 @@ function generateTableContent(code) {
     lines.forEach((line, lineIndex) => {
         let colStart = 0;
         let formattedLine = "";
-        const words = line.match(/>=|<=|<>|:=|\/\/.*|\{[^\}]*\}|\d+\.\d+|\w+|\S/g) || [];
+        const words = line.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g) || [];
 
         let lastIndex = 0;
         words.forEach(word => {
             if (word.trim() !== "") {
-                let tokenType;
+                let tokenType = "";
                 let spanClass = "";
 
                 if (insideCommentBlock) {
@@ -204,8 +204,7 @@ function generateTableContent(code) {
                     if (word.includes("}")) { 
                         insideCommentBlock = false;
                     }
-                }
-                if (tokens[word]) {
+                } else if (tokens[word]) {
                     tokenType = tokens[word];
                     spanClass = "reserved_word";
                 } else if (reg_int.test(word)) {
@@ -228,7 +227,6 @@ function generateTableContent(code) {
                     tokenType = "Error";
                     spanClass = "error";
                 }
-                5+5 // m 
                 const wordIndex = line.indexOf(word, lastIndex);
                 formattedLine += line.substring(lastIndex, wordIndex);
                 formattedLine += `<span class="${spanClass}" spellcheck="false">${word}</span>`;
@@ -246,7 +244,7 @@ function generateTableContent(code) {
     code_html = code_html.slice(0, -1); // remove o \n extra que estava sobrando
 
     html_content = code_html;
-    Criar_tabela_lexemas(table_content);
+    criar_tabela_lexemas(table_content);
     return table_content;
 }
 
