@@ -35,6 +35,14 @@ file_chooser.addEventListener("change", (event) => {
       update_line_numbers();
 })
 
+function Criar_tabela_lexemas(table){
+    Syntatic_table = [...table];
+    Syntatic_table.shift();
+    Syntatic_table.forEach((value,index) => {
+        Syntatic_table[index] = Syntatic_table[index].slice(0,2);
+    });
+}
+
 function update_line_numbers() {
     const lines = editor.innerText.split('\n').length;
     line_numbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join("<br>");
