@@ -311,9 +311,9 @@ function update_colors(){
 }
 
 const Tabela_declaracao_variavel = [[''    ,'tipo'      ,'ident'     ,','             ,';'   ,'$'],
-                                   ['PDV'  ,'DV , DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
+                                   ['PDV'  ,'DV ; DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
                                    ['DV'   ,'tipo LI'   ,'cu'        ,'cu'            ,'cu'  ,'cu'],
-                                   ['DV*'  ,'DV , DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
+                                   ['DV*'  ,'DV ; DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
                                    ['LI'   ,'cu'        ,'ident LI*' ,'cu'            ,'cu'  ,'cu'],
                                    ['LI*'  ,'cu'        ,'cu'        ,'\, ident LI*'  ,''   ,'cu']];
 
@@ -327,19 +327,30 @@ function analizador_sintatico(){
     let pilha = ['$'];
     pilha.push(Tabela_declaracao_variavel[1][0]);
     let entrada = editor.innerText + "$";
-    entrada = entrada.replace(/(\r\n|\n|\r)/gm, " ");
+
+    entrada = entrada.replace(/(\r\n|\n|\r)/gm, "");
     entrada = entrada.replace(/(int|boolean)/gm, "tipo");
-    while(pilha[pilha.length - 1] !== "$"){
+    entrada = entrada.replace(/;/gm, " ; ");
+    entrada = entrada.replace(/,/gm, " ,");
+
+    while(pilha[pilha.length - 1] !== "$" && entrada !== "$"){
         let token = entrada.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g)[0];
+        token_antigo = [...token];
+        if (!Tabela_declaracao_variavel[0].includes(token)){
+            token = "ident"}
         if (pilha[pilha.length - 1] === token){
-            pilha.shift();
-            entrada = entrada.slice(token.length);
+            pilha.pop();
+            entrada = entrada.slice(token_antigo.length+1);
         } else if (Tabela_declaracao_variavel[0].includes(token) && matriz_transposta[0].includes(pilha[pilha.length - 1])){
             let index = matriz_transposta[0].indexOf(pilha[pilha.length - 1]);
             pilha.pop();
             let producao = Tabela_declaracao_variavel[index][Tabela_declaracao_variavel[0].indexOf(token)];
-            if (producao !== 'cu'){
-                pilha.unshift(...producao.split(' '));
+            if (producao !== 'cu' || producao === ''){
+                if(producao === ''){
+                    continue;
+                }else{
+                    pilha.push(...producao.split(' ').reverse());
+                }
             }
         } else {
             console.log("Erro de sintaxe: " + token);
