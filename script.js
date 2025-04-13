@@ -233,7 +233,7 @@ function generateTableContent(code) {
                     insideCommentBlock = true;
                 } else {
                     tokenType = "Error";
-                    spanClass = "error";
+                    spanClass = "cu";
                 }
                 const wordIndex = line.indexOf(word, lastIndex);
                 formattedLine += line.substring(lastIndex, wordIndex);
@@ -308,5 +308,48 @@ function update_colors(){
     let code = editor.innerText;
     generateTableContent(code);
     editor.innerHTML = html_content;
+}
+
+const Tabela_declaracao_variavel = [[''    ,'tipo'      ,'ident'     ,','             ,';'   ,'$'],
+                                   ['PDV'  ,'DV , DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
+                                   ['DV'   ,'tipo LI'   ,'cu'        ,'cu'            ,'cu'  ,'cu'],
+                                   ['DV*'  ,'DV , DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
+                                   ['LI'   ,'cu'        ,'ident LI*' ,'cu'            ,'cu'  ,'cu'],
+                                   ['LI*'  ,'cu'        ,'cu'        ,'\, ident LI*'  ,''   ,'cu']];
+
+function transposeMatrix(matrix) {
+    return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+}
+
+function analizador_sintatico(){
+    debugger;
+    let matriz_transposta = transposeMatrix(Tabela_declaracao_variavel);
+    let pilha = ['$'];
+    pilha.push(Tabela_declaracao_variavel[1][0]);
+    let entrada = editor.innerText + "$";
+    entrada = entrada.replace(/(\r\n|\n|\r)/gm, " ");
+    entrada = entrada.replace(/(int|boolean)/gm, "tipo");
+    while(pilha[pilha.length - 1] !== "$"){
+        let token = entrada.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g)[0];
+        if (pilha[pilha.length - 1] === token){
+            pilha.shift();
+            entrada = entrada.slice(token.length);
+        } else if (Tabela_declaracao_variavel[0].includes(token) && matriz_transposta[0].includes(pilha[pilha.length - 1])){
+            let index = matriz_transposta[0].indexOf(pilha[pilha.length - 1]);
+            pilha.pop();
+            let producao = Tabela_declaracao_variavel[index][Tabela_declaracao_variavel[0].indexOf(token)];
+            if (producao !== 'cu'){
+                pilha.unshift(...producao.split(' '));
+            }
+        } else {
+            console.log("Erro de sintaxe: " + token);
+            break;
+        }
+    }
+    if (pilha[0] === "$"){
+        console.log("Análise sintática concluída com sucesso!");
+    } else {
+        console.log("Erro de sintaxe: " + pilha[0]);
+    }
 }
 
