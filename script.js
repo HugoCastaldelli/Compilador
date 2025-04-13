@@ -310,3 +310,57 @@ function update_colors(){
     editor.innerHTML = html_content;
 }
 
+const Tabela_declaracao_variavel = [[''    ,'tipo'      ,'ident'     ,','             ,';'   ,'$'],
+                                   ['PDV'  ,'DV ; DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
+                                   ['DV'   ,'tipo LI'   ,'cu'        ,'cu'            ,'cu'  ,'cu'],
+                                   ['DV*'  ,'DV ; DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
+                                   ['LI'   ,'cu'        ,'ident LI*' ,'cu'            ,'cu'  ,'cu'],
+                                   ['LI*'  ,'cu'        ,'cu'        ,'\, ident LI*'  ,''   ,'cu']];
+
+function transposeMatrix(matrix) {
+    return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+}
+
+function analizador_sintatico(){
+    debugger;
+    let matriz_transposta = transposeMatrix(Tabela_declaracao_variavel);
+    let pilha = ['$'];
+    pilha.push(Tabela_declaracao_variavel[1][0]);
+    let entrada = editor.innerText + "$";
+
+    entrada = entrada.replace(/(\r\n|\n|\r)/gm, "");
+    entrada = entrada.replace(/(int|boolean)/gm, "tipo");
+    entrada = entrada.replace(/;/gm, " ; ");
+    entrada = entrada.replace(/,/gm, " ,");
+
+    while(pilha[pilha.length - 1] !== "$" && entrada !== "$"){
+        let token = entrada.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g)[0];
+        token_antigo = [...token];
+        if (!Tabela_declaracao_variavel[0].includes(token)){
+            token = "ident"}
+        if (pilha[pilha.length - 1] === token){
+            pilha.pop();
+            entrada = entrada.slice(token_antigo.length+1);
+        } else if (Tabela_declaracao_variavel[0].includes(token) && matriz_transposta[0].includes(pilha[pilha.length - 1])){
+            let index = matriz_transposta[0].indexOf(pilha[pilha.length - 1]);
+            pilha.pop();
+            let producao = Tabela_declaracao_variavel[index][Tabela_declaracao_variavel[0].indexOf(token)];
+            if (producao !== 'cu' || producao === ''){
+                if(producao === ''){
+                    continue;
+                }else{
+                    pilha.push(...producao.split(' ').reverse());
+                }
+            }
+        } else {
+            console.log("Erro de sintaxe: " + token);
+            break;
+        }
+    }
+    if (pilha[0] === "$"){
+        console.log("Análise sintática concluída com sucesso!");
+    } else {
+        console.log("Erro de sintaxe: " + pilha[0]);
+    }
+}
+
