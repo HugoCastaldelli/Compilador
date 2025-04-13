@@ -233,7 +233,7 @@ function generateTableContent(code) {
                     insideCommentBlock = true;
                 } else {
                     tokenType = "Error";
-                    spanClass = "cu";
+                    spanClass = "Error";
                 }
                 const wordIndex = line.indexOf(word, lastIndex);
                 formattedLine += line.substring(lastIndex, wordIndex);
