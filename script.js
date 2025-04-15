@@ -5,6 +5,14 @@ const file_chooser = document.getElementById("file_chooser");
 let Syntatic_table;
 let html_content;
 
+const reservedWords = ["program", "procedure", "var", "int", "boolean", "read", "write", "true", "false", 
+    "begin", "end", "if", "then", "else", "while", "do", "or", "and", "not"];
+
+const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]{0,24})$/;
+const reg_int = /^(0|[1-9][0-9]{0,24})$/;
+const operator = /^([+\-*/])$/;
+
+
 document.getElementById("dowload_btn").addEventListener("click", function() {
     var conteudo = editor.innerText;
     
@@ -153,9 +161,6 @@ function criar_tabela_lexemas(table){
 }
 
 function generateTokens(){
-    const reservedWords = ["program", "procedure", "var", "int", "boolean", "read", "write", "true", "false", 
-                           "begin", "end", "if", "then", "else", "while", "do", "or", "and", "not"];
-
     const tokens = {};
 
     reservedWords.forEach(word => {
@@ -187,10 +192,6 @@ function generateTableContent(code) {
 
     const tokens = generateTokens();
 
-    const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]{0,24})$/;
-    const reg_int = /^(0|[1-9][0-9]{0,24})$/;
-    const operator = /^([+\-*/])$/;
-    
     const lines = code.split("\n");
     let code_html = "";
     let insideCommentBlock = false;
@@ -311,11 +312,11 @@ function update_colors(){
 }
 
 const Tabela_declaracao_variavel = [[''    ,'tipo'      ,'ident'     ,','             ,';'   ,'$'],
-                                   ['PDV'  ,'DV ; DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
-                                   ['DV'   ,'tipo LI'   ,'cu'        ,'cu'            ,'cu'  ,'cu'],
-                                   ['DV*'  ,'DV ; DV*'  ,'cu'        ,'cu'            ,'cu'  ,''],
-                                   ['LI'   ,'cu'        ,'ident LI*' ,'cu'            ,'cu'  ,'cu'],
-                                   ['LI*'  ,'cu'        ,'cu'        ,'\, ident LI*'  ,''   ,'cu']];
+                                   ['PDV'  ,'DV ; DV*'  ,'er'        ,'er'            ,'er'  ,''],
+                                   ['DV'   ,'tipo LI'   ,'er'        ,'er'            ,'er'  ,'er'],
+                                   ['DV*'  ,'DV ; DV*'  ,'er'        ,'er'            ,'er'  ,''],
+                                   ['LI'   ,'er'        ,'ident LI*' ,'er'            ,'er'  ,'er'],
+                                   ['LI*'  ,'er'        ,'er'        ,'\, ident LI*'  ,''   ,'er']];
 
 function transposeMatrix(matrix) {
     return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
@@ -323,20 +324,23 @@ function transposeMatrix(matrix) {
 
 function analizador_sintatico(){
     debugger;
+    errors = []
     let matriz_transposta = transposeMatrix(Tabela_declaracao_variavel);
     let pilha = ['$'];
     pilha.push(Tabela_declaracao_variavel[1][0]);
     let entrada = editor.innerText + "$";
 
-    entrada = entrada.replace(/(\r\n|\n|\r)/gm, "");
     entrada = entrada.replace(/(int|boolean)/gm, "tipo");
-    entrada = entrada.replace(/;/gm, " ; ");
-    entrada = entrada.replace(/,/gm, " ,");
-
+    entrada.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g).forEach(value => {
+        entrada = entrada.replace(value, ` ${value} `);
+    });
+    entrada = entrada.replace(/\s+/gm, " ");
+    entrada = entrada.trim();
+    
     while(pilha[pilha.length - 1] !== "$" && entrada !== "$"){
         let token = entrada.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g)[0];
         token_antigo = [...token];
-        if (!Tabela_declaracao_variavel[0].includes(token)){
+        if (!Tabela_declaracao_variavel[0].includes(token) && reg_var.test(token) && !reservedWords.includes(token)){
             token = "ident"}
         if (pilha[pilha.length - 1] === token){
             pilha.pop();
@@ -345,7 +349,7 @@ function analizador_sintatico(){
             let index = matriz_transposta[0].indexOf(pilha[pilha.length - 1]);
             pilha.pop();
             let producao = Tabela_declaracao_variavel[index][Tabela_declaracao_variavel[0].indexOf(token)];
-            if (producao !== 'cu' || producao === ''){
+            if (producao !== 'er' || producao === ''){
                 if(producao === ''){
                     continue;
                 }else{
@@ -353,14 +357,16 @@ function analizador_sintatico(){
                 }
             }
         } else {
-            console.log("Erro de sintaxe: " + token);
-            break;
+            if (!Tabela_declaracao_variavel[0].includes(token)){
+                errors.push(`Error: ${token} não é um token válido`);
+            }  
+            pilha.pop();
+            entrada = entrada.slice(token_antigo.length+1);
         }
     }
-    if (pilha[0] === "$"){
-        console.log("Análise sintática concluída com sucesso!");
-    } else {
-        console.log("Erro de sintaxe: " + pilha[0]);
+    if (errors.length == 0){
+        alert("Código Válido");
     }
+
 }
 
