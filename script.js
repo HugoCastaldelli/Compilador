@@ -323,7 +323,6 @@ function transposeMatrix(matrix) {
 }
 
 function analizador_sintatico(){
-    debugger;
     errors = []
     let matriz_transposta = transposeMatrix(Tabela_declaracao_variavel);
     let pilha = ['$'];
@@ -357,10 +356,7 @@ function analizador_sintatico(){
                 }
             }
         } else {
-            if (!Tabela_declaracao_variavel[0].includes(token)){
-                errors.push(`Error: ${token} não é um token válido`);
-            }  
-            pilha.pop();
+            Tratamento_erro_sintatica(pilha,tabela,token,errors);
             entrada = entrada.slice(token_antigo.length+1);
         }
     }
@@ -370,3 +366,16 @@ function analizador_sintatico(){
 
 }
 
+// o símbolo corrente da entrada não possui produção correspondente a partir do não-terminal contido no topo da pilha.
+
+function Tratamento_erro_sintatica(pilha,tabela,tabela_transp,token,errors){
+    let topo_naoterminal = pilha[pilha.length - 1].isUpperCase();
+    let topo_terminal = pilha[pilha.length - 1].isLowerCase();
+
+    if (!Tabela_declaracao_variavel[0].includes(token)){
+        errors.push(`Error: ${token} não é um token válido`);
+    }  
+    if (topo_terminal && pilha[pilha.length - 1] !== token){
+        errors.push(`Error: ${token} não é um token válido`);
+    }
+}
