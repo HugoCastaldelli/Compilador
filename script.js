@@ -152,14 +152,6 @@ function create_table(content) {
     return table;
 }
 
-function criar_tabela_lexemas(table){
-    Syntatic_table = [...table];
-    Syntatic_table.shift();
-    Syntatic_table.forEach((value,index) => {
-        Syntatic_table[index] = Syntatic_table[index].slice(0,2);
-    });
-}
-
 function generateTokens(){
     const tokens = {};
 
@@ -233,7 +225,7 @@ function generateTableContent(code) {
                     spanClass = "comment";
                     insideCommentBlock = true;
                 } else {
-                    tokenType = "Error";
+                    tokenType = "Erro lexico";
                     spanClass = "error";
                 }
                 const wordIndex = line.indexOf(word, lastIndex);
@@ -252,8 +244,8 @@ function generateTableContent(code) {
     });
     code_html = code_html.slice(0, -1); // remove o \n extra que estava sobrando
 
-    html_content = code_html;
-    criar_tabela_lexemas(table_content);
+    html_content = code_html; //para as cores
+
     return table_content;
 }
 
@@ -311,71 +303,102 @@ function update_colors(){
     editor.innerHTML = html_content;
 }
 
-const Tabela_declaracao_variavel = [[''    ,'tipo'      ,'ident'     ,','             ,';'   ,'$'],
-                                   ['PDV'  ,'DV ; DV*'  ,'er'        ,'er'            ,'er'  ,''],
-                                   ['DV'   ,'tipo LI'   ,'er'        ,'er'            ,'er'  ,'er'],
-                                   ['DV*'  ,'DV ; DV*'  ,'er'        ,'er'            ,'er'  ,''],
-                                   ['LI'   ,'er'        ,'ident LI*' ,'er'            ,'er'  ,'er'],
-                                   ['LI*'  ,'er'        ,'er'        ,'\, ident LI*'  ,''   ,'er']];
-
 function transposeMatrix(matrix) {
     return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
 }
 
-function analizador_sintatico(){
-    errors = []
-    let matriz_transposta = transposeMatrix(Tabela_declaracao_variavel);
-    let pilha = ['$'];
-    pilha.push(Tabela_declaracao_variavel[1][0]);
-    let entrada = editor.innerText + "$";
+function filtrarErrosETriangular(tabela) {
+    if (!Array.isArray(tabela) || tabela.length <= 1) return tabela;
 
-    entrada = entrada.replace(/(int|boolean)/gm, "tipo");
-    entrada.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g).forEach(value => {
-        entrada = entrada.replace(value, ` ${value} `);
-    });
-    entrada = entrada.replace(/\s+/gm, " ");
-    entrada = entrada.trim();
+    const cabecalho = tabela[0];
     
-    while(pilha[pilha.length - 1] !== "$" && entrada !== "$"){
-        let token = entrada.match(/>=|<=|<>|:=|\/\/.*|\d+\.\d+|\w+|\S/g)[0];
-        token_antigo = [...token];
-        if (!Tabela_declaracao_variavel[0].includes(token) && reg_var.test(token) && !reservedWords.includes(token)){
-            token = "ident"}
-        if (pilha[pilha.length - 1] === token){
-            pilha.pop();
-            entrada = entrada.slice(token_antigo.length+1);
-        } else if (Tabela_declaracao_variavel[0].includes(token) && matriz_transposta[0].includes(pilha[pilha.length - 1])){
-            let index = matriz_transposta[0].indexOf(pilha[pilha.length - 1]);
-            pilha.pop();
-            let producao = Tabela_declaracao_variavel[index][Tabela_declaracao_variavel[0].indexOf(token)];
-            if (producao !== 'er' || producao === ''){
-                if(producao === ''){
-                    continue;
-                }else{
-                    pilha.push(...producao.split(' ').reverse());
-                }
-            }
-        } else {
-            Tratamento_erro_sintatica(pilha,tabela,token,errors);
-            entrada = entrada.slice(token_antigo.length+1);
-        }
-    }
-    if (errors.length == 0){
-        alert("Código Válido");
-    }
+    // Filtra apenas as linhas que têm "Erro" no início da segunda coluna
+    const erros = tabela.slice(1).filter(linha => 
+        typeof linha[1] === 'string' && linha[1].startsWith("Erro")
+    );
 
+    // Ordena por Linha (índice 2) e Coluna Inicio (índice 3)
+    erros.sort((a, b) => {
+        const linhaA = parseInt(a[2], 10);
+        const linhaB = parseInt(b[2], 10);
+        if (linhaA !== linhaB) return linhaA - linhaB;
+        return parseInt(a[3], 10) - parseInt(b[3], 10);
+    });
+
+    return [cabecalho, ...erros];
 }
 
-// o símbolo corrente da entrada não possui produção correspondente a partir do não-terminal contido no topo da pilha.
+const TDV = [[''     ,'int'       ,'boolean'   ,'ident'     ,','             ,';'   ,'$'  ],
+             ['PDV'  ,'DV ; DV*'  ,'DV ; DV*'  ,'er'        ,'er'            ,'er'  ,''   ],
+             ['DV'   ,'int LI'    ,'boolean LI','er'        ,'er'            ,'er'  ,'er' ],
+             ['DV*'  ,'DV ; DV*'  ,'DV ; DV*'  ,'er'        ,'er'            ,'er'  ,''   ],
+             ['LI'   ,'er'        ,'er'        ,'ident LI*' ,'er'            ,'er'  ,'er' ],
+             ['LI*'  ,'er'        ,'er'        ,'er'        ,'\, ident LI*'  ,''    ,'er' ]];
 
-function Tratamento_erro_sintatica(pilha,tabela,tabela_transp,token,errors){
-    let topo_naoterminal = pilha[pilha.length - 1].isUpperCase();
-    let topo_terminal = pilha[pilha.length - 1].isLowerCase();
+function analizador_sintatico() {
+    // debugger;
+    errors = [];
 
-    if (!Tabela_declaracao_variavel[0].includes(token)){
-        errors.push(`Error: ${token} não é um token válido`);
-    }  
-    if (topo_terminal && pilha[pilha.length - 1] !== token){
-        errors.push(`Error: ${token} não é um token válido`);
+    let matriz_transposta = transposeMatrix(TDV);
+    let pilha = ['$'];
+    pilha.push(TDV[1][0]);
+
+    let code = editor.innerText;
+    let no_comments_code = remove_comments(code);
+    const table_content = generateTableContent(no_comments_code);
+
+    let entrada = table_content.map(item => item[0]); // lista de tokens
+    entrada.shift();
+    entrada.push('$');
+
+    while (pilha[pilha.length - 1] !== '$' && entrada.length > 0) {
+        let token = entrada[0];
+        let token_original = token;
+
+        // Verifica se é identificador
+        if (!TDV[0].includes(token) && reg_var.test(token) && !reservedWords.includes(token)) {
+            token = "ident";
+        }
+
+        if (pilha[pilha.length - 1] === token) {
+            pilha.pop();
+            entrada.shift(); // avança no input
+        } else if (TDV[0].includes(token) && matriz_transposta[0].includes(pilha[pilha.length - 1])) {
+            let index = matriz_transposta[0].indexOf(pilha[pilha.length - 1]);
+            pilha.pop();
+            let producao = TDV[index][TDV[0].indexOf(token)];
+            if (producao !== 'er' && producao !== '') {
+                pilha.push(...producao.split(' ').reverse());
+            } else if (producao === '') {
+                continue;
+            }
+        } else {
+            errors.push(entrada[0]);
+            entrada.shift(); 
+        }
+    }
+
+    if (errors.length === 0) {
+        console.log("Código Válido");
+        table_container.innerText = "";
+    } else {
+        // Adiciona cada erro como uma nova linha na tabela
+        let error_table = table_content;
+        errors.forEach(erro => {
+            // Procura os dados originais do token na tabela original
+            let dados_originais = table_content.find(row => row[0] === erro);
+    
+            // Se encontrar os dados, usa as colunas seguintes
+            if (dados_originais) {
+                error_table.push([erro, "Erro sintatico", ...dados_originais.slice(2)]);
+            } else {
+                // Se não encontrar, adiciona só o erro e a descrição
+                error_table.push([erro, "Erro sintatico"]);
+            }
+        });
+    
+        const tabela_filtrada = filtrarErrosETriangular(error_table);
+        table_container.innerText = "";
+        table_container.appendChild(create_table(tabela_filtrada));
     }
 }

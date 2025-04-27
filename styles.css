@@ -78,7 +78,7 @@ td{
     white-space: nowrap;
 }
 
-input[type="file"], #dowload_btn, #lexico_btn {
+input[type="file"], #dowload_btn, #lexico_btn, button {
     display: none;
 }
 

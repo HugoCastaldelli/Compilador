@@ -13,8 +13,9 @@
             Carregar arquivo
         </label>
         <input type="file" accept=".txt" id="file_chooser">
+
         <label for="dowload_btn" class="custom_btn">
-            Carregar arquivo
+            Salvar arquivo
         </label>
         <button id="dowload_btn">Baixar codigo</button>
     </header>
@@ -28,8 +29,11 @@
     <label for="lexico_btn" class="custom_btn">
         Lexico
     </label>
+    <label for="compilar_btn" class="custom_btn">
+        Compilar
+    </label>
     <button type="button" onclick="analizador_lexico()" id="lexico_btn">Lexico</button>
-    <button type="button" onclick="analizador_sintatico()">WIP</button>
+    <button type="button" onclick="analizador_sintatico()" id="compilar_btn">WIP</button>
 
 
     <div id="table_container"></div>
