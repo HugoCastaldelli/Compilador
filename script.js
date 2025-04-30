@@ -1,6 +1,7 @@
 const editor = document.getElementById("code_editor");
 const line_numbers = document.getElementById("line_numbers");
 const table_container = document.getElementById("table_container");
+const table_container_sintatica = document.getElementById("table_container_sintatica");
 const file_chooser = document.getElementById("file_chooser"); 
 let Syntatic_table;
 let html_content;
@@ -351,9 +352,14 @@ function analizador_sintatico() {
     entrada.shift();
     entrada.push('$');
 
+    let tabela_sintatica = [["Pilha", "Entrada"]];
+
     while (pilha[pilha.length - 1] !== '$' && entrada.length > 0) {
         let token = entrada[0];
         let token_original = token;
+        
+        tabela_sintatica.push([pilha.slice().reverse().join(' '), entrada.join(' ')]);
+
 
         // Verifica se é identificador
         if (!TDV[0].includes(token) && reg_var.test(token) && !reservedWords.includes(token)) {
@@ -401,4 +407,7 @@ function analizador_sintatico() {
         table_container.innerText = "";
         table_container.appendChild(create_table(tabela_filtrada));
     }
+    console.log(tabela_sintatica)
+    table_container_sintatica.innerText = "";
+    table_container_sintatica.appendChild(create_table(tabela_sintatica));
 }

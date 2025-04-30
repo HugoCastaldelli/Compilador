@@ -57,7 +57,7 @@ pre {
     margin: 0;
 }
 
-#table_container {
+#table_container, #table_container_sintatica {
     width: 80%;
     margin-top: 20px;
     overflow-x: auto;
