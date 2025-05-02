@@ -27,17 +27,34 @@
     </div>
 
     <label for="lexico_btn" class="custom_btn">
-        Lexico
-    </label>
-    <label for="compilar_btn" class="custom_btn">
         Compilar
     </label>
-    <button type="button" onclick="analizador_lexico()" id="lexico_btn">Lexico</button>
-    <button type="button" onclick="analizador_sintatico()" id="compilar_btn">WIP</button>
 
+    <button type="button" onclick="Compilar()" id="lexico_btn">Compilar</button>
 
+    <div style="margin-top: 10px;">
+
+        <label for="token_btn" class="custom_btn">
+            Tokens 
+        </label>
+        <button type="button" id = "token_btn"></button>
+
+        <label for="tabela_btn" class="custom_btn">
+            Tabela preditiva
+        </label>
+        <button type="button" id = "tabela_btn"></button>
+
+        <label for="analisador_btn" class="custom_btn">
+            Analisador Preditivo
+        </label>
+        <button type="button" id = "analisador_btn"></button>
+
+        <label for="erros_btn" class="custom_btn">
+            Erros
+        </label>
+        <button type="button" id = "erros_btn"></button>
+    </div>
     <div id="table_container"></div>
-    <div id="table_container_sintatica"></div>
 
     <script src="script.js"></script>
 </body>

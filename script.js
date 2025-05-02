@@ -1,8 +1,13 @@
 const editor = document.getElementById("code_editor");
 const line_numbers = document.getElementById("line_numbers");
 const table_container = document.getElementById("table_container");
-const table_container_sintatica = document.getElementById("table_container_sintatica");
 const file_chooser = document.getElementById("file_chooser"); 
+
+const token_btn = document.getElementById("token_btn");
+const tabela_btn = document.getElementById("tabela_btn");
+const erros_btn = document.getElementById("erros_btn");
+const analisador_btn = document.getElementById("analisador_btn");
+
 let Syntatic_table;
 let html_content;
 
@@ -13,6 +18,7 @@ const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]{0,24})$/;
 const reg_int = /^(0|[1-9][0-9]{0,24})$/;
 const operator = /^([+\-*/])$/;
 
+let Erros,Analisador_preditivo, Tokenss;
 
 document.getElementById("dowload_btn").addEventListener("click", function() {
     var conteudo = editor.innerText;
@@ -44,14 +50,6 @@ file_chooser.addEventListener("change", (event) => {
         update_colors();
     }, "100");
 })
-
-function Criar_tabela_lexemas(table){
-    Syntatic_table = [...table];
-    Syntatic_table.shift();
-    Syntatic_table.forEach((value,index) => {
-        Syntatic_table[index] = Syntatic_table[index].slice(0,2);
-    });
-}
 
 function update_line_numbers() {
     const lines = editor.innerText.split('\n').length;
@@ -173,8 +171,6 @@ function generateTokens(){
     tokens["<="] = "equal or less than";
     tokens[":="] = "assignment";
     tokens[":"] = "vartype";
-    // tokens["{"] = "open comment";
-    // tokens["}"] = "close comment";
     tokens["//"] = "comment line";
 
     return tokens;
@@ -294,8 +290,8 @@ function analizador_lexico(){
     no_comments_code = remove_comments(code);
     
     const table_content = generateTableContent(no_comments_code);
-    table_container.innerText = "";
-    table_container.appendChild(create_table(table_content));
+    //  TOKEN
+    Tokenss = table_content;
 }
 
 function update_colors(){
@@ -388,26 +384,48 @@ function analizador_sintatico() {
         console.log("Código Válido");
         table_container.innerText = "";
     } else {
-        // Adiciona cada erro como uma nova linha na tabela
         let error_table = table_content;
         errors.forEach(erro => {
-            // Procura os dados originais do token na tabela original
             let dados_originais = table_content.find(row => row[0] === erro);
     
-            // Se encontrar os dados, usa as colunas seguintes
             if (dados_originais) {
                 error_table.push([erro, "Erro sintatico", ...dados_originais.slice(2)]);
             } else {
-                // Se não encontrar, adiciona só o erro e a descrição
                 error_table.push([erro, "Erro sintatico"]);
             }
         });
     
         const tabela_filtrada = filtrarErrosETriangular(error_table);
-        table_container.innerText = "";
-        table_container.appendChild(create_table(tabela_filtrada));
+        Erros = tabela_filtrada;
     }
-    console.log(tabela_sintatica)
-    table_container_sintatica.innerText = "";
-    table_container_sintatica.appendChild(create_table(tabela_sintatica));
+
+    tabela_sintatica.push([pilha.slice().reverse().join(' '), entrada.join(' ')]);
+    Analisador_preditivo = tabela_sintatica;
 }
+
+function Compilar(){
+    table_container.innerText = "";
+    analizador_lexico();
+    analizador_sintatico();
+}
+
+token_btn.addEventListener("click", function() {
+    table_container.innerText = "";
+    table_container.appendChild(create_table(Tokenss));
+});
+
+tabela_btn.addEventListener("click", function() {
+    table_container.innerText = "";
+    table_container.appendChild(create_table(TDV));
+});
+
+erros_btn.addEventListener("click", function() {
+    table_container.innerText = "";
+    table_container.appendChild(create_table(Erros));
+});
+
+analisador_btn.addEventListener("click", function() {
+    table_container.innerText = "";
+    Compilar();
+    table_container.appendChild(create_table(Analisador_preditivo));
+});

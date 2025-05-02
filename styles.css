@@ -90,6 +90,11 @@ input[type="file"], #dowload_btn, #lexico_btn, button {
     padding: 5px;
 }
 
+.custom_btn:hover {
+    background-color: #3a3f47;
+    cursor: pointer;
+}
+
 header {
     display: flex;
     justify-content: center;
