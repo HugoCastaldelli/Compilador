@@ -3,6 +3,7 @@ const line_numbers = document.getElementById("line_numbers");
 const table_container = document.getElementById("table_container");
 const file_chooser = document.getElementById("file_chooser"); 
 
+const lexico_btn = document.getElementById("lexico_btn");
 const token_btn = document.getElementById("token_btn");
 const tabela_btn = document.getElementById("tabela_btn");
 const erros_btn = document.getElementById("erros_btn");
@@ -11,14 +12,30 @@ const analisador_btn = document.getElementById("analisador_btn");
 let Syntatic_table;
 let html_content;
 
-const reservedWords = ["program", "procedure", "var", "int", "boolean", "read", "write", "true", "false", 
-    "begin", "end", "if", "then", "else", "while", "do", "or", "and", "not"];
+lexico_btn.addEventListener("click", function() {
+    Compilar();
+});
 
-const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]{0,24})$/;
-const reg_int = /^(0|[1-9][0-9]{0,24})$/;
-const operator = /^([+\-*/])$/;
+token_btn.addEventListener("click", function() {
+    table_container.innerText = "";
+    table_container.appendChild(create_table(Tokenss));
+});
 
-let Erros,Analisador_preditivo, Tokenss;
+tabela_btn.addEventListener("click", function() {
+    table_container.innerText = "";
+    table_container.appendChild(create_table(TDV));
+});
+
+erros_btn.addEventListener("click", function() {
+    table_container.innerText = "";
+    table_container.appendChild(create_table(Erros));
+});
+
+analisador_btn.addEventListener("click", function() {
+    table_container.innerText = "";
+    Compilar();
+    table_container.appendChild(create_table(Analisador_preditivo));
+});
 
 document.getElementById("dowload_btn").addEventListener("click", function() {
     var conteudo = editor.innerText;
@@ -151,6 +168,34 @@ function create_table(content) {
     return table;
 }
 
+
+/*
+
+
+
+
+
+
+    Logica do compilador
+
+
+
+
+
+
+
+*/
+
+
+const reservedWords = ["program", "procedure", "var", "int", "boolean", "read", "write", "true", "false", 
+    "begin", "end", "if", "then", "else", "while", "do", "or", "and", "not"];
+
+const reg_var = /^([a-zA-Z_][a-zA-Z0-9_]{0,24})$/;
+const reg_int = /^(0|[1-9][0-9]{0,24})$/;
+const operator = /^([+\-*/])$/;
+
+let Erros,Analisador_preditivo, Tokenss;
+
 function generateTokens(){
     const tokens = {};
 
@@ -282,8 +327,8 @@ function remove_comments(code){
         i = i - (comment_end_index - comment_start_index);
     }
     return code;
-
 }
+
 function analizador_lexico(){
     let code = editor.innerText;
 
@@ -333,8 +378,7 @@ const TDV = [[''     ,'int'       ,'boolean'   ,'ident'     ,','             ,';
              ['LI*'  ,'er'        ,'er'        ,'er'        ,'\, ident LI*'  ,''    ,'er' ]];
 
 function analizador_sintatico() {
-    // debugger;
-    errors = [];
+    errors_list = [];
 
     let matriz_transposta = transposeMatrix(TDV);
     let pilha = ['$'];
@@ -375,17 +419,17 @@ function analizador_sintatico() {
                 continue;
             }
         } else {
-            errors.push(entrada[0]);
+            errors_list.push(entrada[0]);
             entrada.shift(); 
         }
     }
 
-    if (errors.length === 0) {
+    if (errors_list.length === 0) {
         console.log("Código Válido");
         table_container.innerText = "";
     } else {
         let error_table = table_content;
-        errors.forEach(erro => {
+        errors_list.forEach(erro => {
             let dados_originais = table_content.find(row => row[0] === erro);
     
             if (dados_originais) {
@@ -407,25 +451,10 @@ function Compilar(){
     table_container.innerText = "";
     analizador_lexico();
     analizador_sintatico();
+
+    // if(errors_list == ""){
+    //     alert("Compilado sem erros");
+    // }else{
+    //     alert("Error");
+    // }
 }
-
-token_btn.addEventListener("click", function() {
-    table_container.innerText = "";
-    table_container.appendChild(create_table(Tokenss));
-});
-
-tabela_btn.addEventListener("click", function() {
-    table_container.innerText = "";
-    table_container.appendChild(create_table(TDV));
-});
-
-erros_btn.addEventListener("click", function() {
-    table_container.innerText = "";
-    table_container.appendChild(create_table(Erros));
-});
-
-analisador_btn.addEventListener("click", function() {
-    table_container.innerText = "";
-    Compilar();
-    table_container.appendChild(create_table(Analisador_preditivo));
-});
