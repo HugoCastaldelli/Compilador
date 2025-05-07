@@ -23,7 +23,10 @@ token_btn.addEventListener("click", function() {
 
 tabela_btn.addEventListener("click", function() {
     table_container.innerText = "";
-    table_container.appendChild(create_table(TDV));
+    let table;
+    table = replace_values(TDV,"","ε");
+    table = replace_values(table,"er","ERROR")
+    table_container.appendChild(create_table(table));
 });
 
 erros_btn.addEventListener("click", function() {
@@ -33,7 +36,6 @@ erros_btn.addEventListener("click", function() {
 
 analisador_btn.addEventListener("click", function() {
     table_container.innerText = "";
-    Compilar();
     table_container.appendChild(create_table(Analisador_preditivo));
 });
 
@@ -67,6 +69,18 @@ file_chooser.addEventListener("change", (event) => {
         update_colors();
     }, "100");
 })
+
+function replace_values(tabela,antigo_valor,novo_valor){
+    let new_table = [...tabela];
+    for (let i = 0; i < tabela.length; i++){
+        for (let j = 0; j < tabela[i].length; j++){
+            if (tabela[i][j] === antigo_valor){
+                new_table[i][j] = novo_valor;
+            }
+        }
+    }
+    return new_table;
+}
 
 function update_line_numbers() {
     const lines = editor.innerText.split('\n').length;
@@ -377,53 +391,53 @@ const TDV = [[''     ,'int'       ,'boolean'   ,'ident'     ,','             ,';
              ['LI'   ,'er'        ,'er'        ,'ident LI*' ,'er'            ,'er'  ,'er' ],
              ['LI*'  ,'er'        ,'er'        ,'er'        ,'\, ident LI*'  ,''    ,'er' ]];
 
-/*
-const TDV = [
-  ['', 'program', 'int', 'boolean', '.', ';', 'procedure', 'begin', '[a-zA-Z_][a-zA-Z_0-9]*', ':', ',', '(', ')', 'var', 'end', 'else', 'if', 'while', ':=', '+', '-', '[0-9]+', 'not', '=', '<>', '<', '<=', '=>', '>', 'then', 'do', ']', 'or', '*', 'div', 'and', '[', '$'],
-  ['<programa>', 'program<identificador>;<bloco>.', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC'],
-  ['<bloco>', 'er', '<parte_de_declaracoes_de_variaveis><parte_de_declaracoes_de_subrotinas><comando_composto>', '<parte_de_declaracoes_de_variaveis><parte_de_declaracoes_de_subrotinas><comando_composto>', '', '', '<parte_de_declaracoes_de_variaveis><parte_de_declaracoes_de_subrotinas><comando_composto>', '<parte_de_declaracoes_de_variaveis><parte_de_declaracoes_de_subrotinas><comando_composto>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<parte_de_declaracoes_de_variaveis>', 'er', '<declaracao_de_variaveis>;<declaracao_de_variaveis\'>', '<declaracao_de_variaveis>;<declaracao_de_variaveis\'>', '', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<declaracao_de_variaveis\'>', 'er', '<declaracao_de_variaveis><declaracao_de_variaveis\'>;', '<declaracao_de_variaveis><declaracao_de_variaveis\'>;', '', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<declaracao_de_variaveis>', 'er', '<tipo><lista_de_identificadores>', '<tipo><lista_de_identificadores>', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<tipo>', 'er', 'int', 'boolean', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<lista_de_identificadores>', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<identificador><lista_de_identificadores\'>', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<lista_de_identificadores\'>', 'er', '', '', '', '', '', '', 'er', '', ',<identificador><lista_de_identificadores\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<parte_de_declaracoes_de_subrotinas>', 'er', 'er', 'er', 'er', 'er', '<declaracao_de_procedimento>;<declaracao_de_procedimento\'>', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<declaracao_de_procedimento\'>', 'er', 'er', 'er', 'er', '', '<declaracao_de_procedimento><declaracao_de_procedimento\'>;', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<declaracao_de_procedimento>', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'procedure<identificador><parâmetros_formais>;<bloco>', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<parâmetros_formais>', 'er', 'er', 'er', 'er', '', 'er', 'er', 'er', 'er', 'er', '(<secao_de_parametros_formais><parâmetros_formais\'>)', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<parâmetros_formais\'>', 'er', 'er', 'er', 'er', ';<secao_de_parametros_formais><parâmetros_formais\'>', 'er', 'er', 'er', 'er', 'er', 'er', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<secao_de_parametros_formais>', 'er', 'er', 'er', 'er', '', 'er', 'er', '<var><lista_de_identificadores>:<identificador>', 'er', 'er', 'er', '', '<var><lista_de_identificadores>:<identificador>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<var>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '', 'er', 'er', 'er', 'er', 'var', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<comando_composto>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'begin<comando><comando_composto\'>end', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<comando_composto\'>', 'er', 'er', 'er', 'er', ';<comando><comando_composto\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<comando>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<comando_composto>', '<identificador><comando\'>', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', '<comando_condicional_1>', '<comando_repetitivo_1>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<comando\'>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', '(<chamada_de_procedimento\'>', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', ':=<expressao>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<atribuicao>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '<variavel>:=<expressao>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<chamada_de_procedimento>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '<identificador><chamada_de_procedimento\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<chamada_de_procedimento\'>', 'er', 'er', 'er', '', '', '', '', '<lista_de_expressoes>)', 'er', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', 'er', '', '', 'er', 'er', 'er', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<comando_condicional_1>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'if<expressao>then<comando><else>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<else>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er', '', 'else<comando>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<comando_repetitivo_1>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'while<expressao>do<comando>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<expressao>', 'er', 'er', 'er', '', '', '', '', '<expressao_simples><expressao\'>', 'er', '', '<expressao_simples><expressao\'>', '', 'er', '', '', 'er', 'er', 'er', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<expressao\'>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', '', 'er', '', 'er', '', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<relacao>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '=', '<>', '<', '<=', '=>', '>', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<expressao_simples>', 'er', 'er', 'er', '', '', '', '', '<op><termo><expressao_simples\'>', 'er', '', '<op><termo><expressao_simples\'>', '', 'er', '', '', 'er', 'er', 'er', '<op><termo><expressao_simples\'>', '<op><termo><expressao_simples\'>', '<op><termo><expressao_simples\'>', '<op><termo><expressao_simples\'>', '', '', '', '', '', '', '', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<op>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '', 'er', 'er', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '+', '-', '', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<expressao_simples\'>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', '', 'er', '', 'er', '', '', 'er', 'er', 'er', '<op2><termo><expressao_simples\'>', '<op2><termo><expressao_simples\'>', 'er', 'er', '', '', '', '', '', '', '', '', '', '<op2><termo><expressao_simples\'>', 'er', 'er', 'er', 'er', 'er'],
-  ['<op2>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '+', '-', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'or', 'er', 'er', 'er', 'er', 'er'],
-  ['<termo>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<fator><termo\'>', 'er', 'TOKEN_SYNC', '<fator><termo\'>', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', '<fator><termo\'>', '<fator><termo\'>', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er'],
-  ['<termo\'>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', '', 'er', '', 'er', '', '', 'er', 'er', 'er', '', '', 'er', 'er', '', '', '', '', '', '', '', '', '', '<op3><fator><termo\'>', '<op3><fator><termo\'>', '<op3><fator><termo\'>', 'er', 'er'],
-  ['<op3>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '*', 'div', 'and', 'er', 'er'],
-  ['<fator>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<variavel>', 'er', 'TOKEN_SYNC', '(<expressao>)', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', '<numero>', 'not<fator>', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er'],
-  ['<variavel>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<identificador><variavel\'>', 'er', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er'],
-  ['<variavel\'>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', '', '(<lista_de_expressoes>)', '', 'er', '', '', 'er', 'er', '', '', '', 'er', 'er', '', '', '', '', '', '', '', '', '', '', '', '', '[<expressao>]', 'er'],
-  ['<lista_de_expressoes>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '<expressao><lista_de_expressoes\'>', 'er', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '', 'er', 'er', 'er', 'er', 'er', 'er', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<lista_de_expressoes\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', ',<expressao><lista_de_expressoes\'>', 'er', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
-  ['<numero>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', '[0-9]+', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er'],
-  ['<identificador>', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '[a-zA-Z_][a-zA-Z_0-9]*', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er']
-];
-*/
+
+// const TDV = [
+//   ['', 'program', 'int', 'boolean', '.', ';', 'procedure', 'begin', '[a-zA-Z_][a-zA-Z_0-9]*', ':', ',', '(', ')', 'var', 'end', 'else', 'if', 'while', ':=', '+', '-', '[0-9]+', 'not', '=', '<>', '<', '<=', '=>', '>', 'then', 'do', ']', 'or', '*', 'div', 'and', '[', '$'],
+//   ['<programa>', 'program<identificador>;<bloco>.', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC'],
+//   ['<bloco>', 'er', '<parte_de_declaracoes_de_variaveis><parte_de_declaracoes_de_subrotinas><comando_composto>', '<parte_de_declaracoes_de_variaveis><parte_de_declaracoes_de_subrotinas><comando_composto>', '', '', '<parte_de_declaracoes_de_variaveis><parte_de_declaracoes_de_subrotinas><comando_composto>', '<parte_de_declaracoes_de_variaveis><parte_de_declaracoes_de_subrotinas><comando_composto>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<parte_de_declaracoes_de_variaveis>', 'er', '<declaracao_de_variaveis>;<declaracao_de_variaveis\'>', '<declaracao_de_variaveis>;<declaracao_de_variaveis\'>', '', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<declaracao_de_variaveis\'>', 'er', '<declaracao_de_variaveis><declaracao_de_variaveis\'>;', '<declaracao_de_variaveis><declaracao_de_variaveis\'>;', '', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<declaracao_de_variaveis>', 'er', '<tipo><lista_de_identificadores>', '<tipo><lista_de_identificadores>', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<tipo>', 'er', 'int', 'boolean', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<lista_de_identificadores>', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<identificador><lista_de_identificadores\'>', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<lista_de_identificadores\'>', 'er', '', '', '', '', '', '', 'er', '', ',<identificador><lista_de_identificadores\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<parte_de_declaracoes_de_subrotinas>', 'er', 'er', 'er', 'er', 'er', '<declaracao_de_procedimento>;<declaracao_de_procedimento\'>', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<declaracao_de_procedimento\'>', 'er', 'er', 'er', 'er', '', '<declaracao_de_procedimento><declaracao_de_procedimento\'>;', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<declaracao_de_procedimento>', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'procedure<identificador><parâmetros_formais>;<bloco>', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<parâmetros_formais>', 'er', 'er', 'er', 'er', '', 'er', 'er', 'er', 'er', 'er', '(<secao_de_parametros_formais><parâmetros_formais\'>)', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<parâmetros_formais\'>', 'er', 'er', 'er', 'er', ';<secao_de_parametros_formais><parâmetros_formais\'>', 'er', 'er', 'er', 'er', 'er', 'er', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<secao_de_parametros_formais>', 'er', 'er', 'er', 'er', '', 'er', 'er', '<var><lista_de_identificadores>:<identificador>', 'er', 'er', 'er', '', '<var><lista_de_identificadores>:<identificador>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<var>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '', 'er', 'er', 'er', 'er', 'var', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<comando_composto>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'begin<comando><comando_composto\'>end', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<comando_composto\'>', 'er', 'er', 'er', 'er', ';<comando><comando_composto\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<comando>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<comando_composto>', '<identificador><comando\'>', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', '<comando_condicional_1>', '<comando_repetitivo_1>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<comando\'>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', '(<chamada_de_procedimento\'>', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', ':=<expressao>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<atribuicao>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '<variavel>:=<expressao>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<chamada_de_procedimento>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '<identificador><chamada_de_procedimento\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<chamada_de_procedimento\'>', 'er', 'er', 'er', '', '', '', '', '<lista_de_expressoes>)', 'er', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', 'er', '', '', 'er', 'er', 'er', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', '<lista_de_expressoes>)', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<comando_condicional_1>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'if<expressao>then<comando><else>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<else>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er', '', 'else<comando>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<comando_repetitivo_1>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'while<expressao>do<comando>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<expressao>', 'er', 'er', 'er', '', '', '', '', '<expressao_simples><expressao\'>', 'er', '', '<expressao_simples><expressao\'>', '', 'er', '', '', 'er', 'er', 'er', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '<expressao_simples><expressao\'>', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<expressao\'>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', '', 'er', '', 'er', '', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '<relacao><expressao_simples>', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<relacao>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '=', '<>', '<', '<=', '=>', '>', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<expressao_simples>', 'er', 'er', 'er', '', '', '', '', '<op><termo><expressao_simples\'>', 'er', '', '<op><termo><expressao_simples\'>', '', 'er', '', '', 'er', 'er', 'er', '<op><termo><expressao_simples\'>', '<op><termo><expressao_simples\'>', '<op><termo><expressao_simples\'>', '<op><termo><expressao_simples\'>', '', '', '', '', '', '', '', '', '', '', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<op>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '', 'er', 'er', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '+', '-', '', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<expressao_simples\'>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', '', 'er', '', 'er', '', '', 'er', 'er', 'er', '<op2><termo><expressao_simples\'>', '<op2><termo><expressao_simples\'>', 'er', 'er', '', '', '', '', '', '', '', '', '', '<op2><termo><expressao_simples\'>', 'er', 'er', 'er', 'er', 'er'],
+//   ['<op2>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '+', '-', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'or', 'er', 'er', 'er', 'er', 'er'],
+//   ['<termo>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<fator><termo\'>', 'er', 'TOKEN_SYNC', '<fator><termo\'>', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', '<fator><termo\'>', '<fator><termo\'>', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er'],
+//   ['<termo\'>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', '', 'er', '', 'er', '', '', 'er', 'er', 'er', '', '', 'er', 'er', '', '', '', '', '', '', '', '', '', '<op3><fator><termo\'>', '<op3><fator><termo\'>', '<op3><fator><termo\'>', 'er', 'er'],
+//   ['<op3>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '*', 'div', 'and', 'er', 'er'],
+//   ['<fator>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<variavel>', 'er', 'TOKEN_SYNC', '(<expressao>)', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', '<numero>', 'not<fator>', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er'],
+//   ['<variavel>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '<identificador><variavel\'>', 'er', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er'],
+//   ['<variavel\'>', 'er', 'er', 'er', '', '', '', '', 'er', 'er', '', '(<lista_de_expressoes>)', '', 'er', '', '', 'er', 'er', '', '', '', 'er', 'er', '', '', '', '', '', '', '', '', '', '', '', '', '[<expressao>]', 'er'],
+//   ['<lista_de_expressoes>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', '<expressao><lista_de_expressoes\'>', 'er', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '', 'er', 'er', 'er', 'er', 'er', 'er', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', '<expressao><lista_de_expressoes\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<lista_de_expressoes\'>', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', ',<expressao><lista_de_expressoes\'>', 'er', '', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er', 'er'],
+//   ['<numero>', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', '[0-9]+', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er'],
+//   ['<identificador>', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', '[a-zA-Z_][a-zA-Z_0-9]*', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er', 'er', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'TOKEN_SYNC', 'er']
+// ];
+
 
 function analizador_sintatico() {
     // debugger;
@@ -437,30 +451,29 @@ function analizador_sintatico() {
     let no_comments_code = remove_comments(code);
     const table_content = generateTableContent(no_comments_code);
 
-    let entrada = table_content.map(item => item[0]); // lista de tokens
+    let entrada = table_content.map(item => item[0]);
     entrada.shift();
     entrada.push('$');
 
     let tabela_sintatica = [["Pilha", "Entrada", "Regra"]];
-    let regra_aplicada = ""; // Variável para armazenar a regra atual
-
+    let regra_aplicada = "";
+    let a = 1;
     while (pilha[pilha.length - 1] !== '$' && entrada.length > 0) {
         let token = entrada[0];
         let token_original = token;
         
         // Adiciona a linha atual com a regra da iteração anterior
-        tabela_sintatica.push([pilha.slice().reverse().join(' '), entrada.join(' '), regra_aplicada]);
-        regra_aplicada = ""; // Reseta a regra para a próxima iteração
+        tabela_sintatica.push([pilha.slice().reverse().join(' '), entrada.join(' ')]);
+        regra_aplicada = "";
 
-        // Verifica se é identificador
         if (!TDV[0].includes(token) && reg_var.test(token) && !reservedWords.includes(token)) {
             token = "ident";
         }
 
         if (pilha[pilha.length - 1] === token) {
             pilha.pop();
-            entrada.shift(); // avanca no input
-            regra_aplicada = "Terminal coincide";
+            entrada.shift();
+            regra_aplicada = "Casa " + token;
         } else if (TDV[0].includes(token) && matriz_transposta[0].includes(pilha[pilha.length - 1])) {
             let index = matriz_transposta[0].indexOf(pilha[pilha.length - 1]);
             let topo_pilha = pilha[pilha.length - 1];
@@ -468,11 +481,13 @@ function analizador_sintatico() {
             let producao = TDV[index][TDV[0].indexOf(token)];
             
             if (producao !== 'er' && producao !== '') {
-                // Guarda a regra que está sendo aplicada
+
                 regra_aplicada = topo_pilha + " -> " + producao;
                 pilha.push(...producao.split(' ').reverse());
             } else if (producao === '') {
-                regra_aplicada = topo_pilha + " -> ε";  // Epsilon para produções vazias
+                regra_aplicada = topo_pilha + " -> ε";
+                tabela_sintatica[a].push(regra_aplicada);
+                a++;
                 continue;
             } else {
                 regra_aplicada = "Erro";
@@ -482,10 +497,12 @@ function analizador_sintatico() {
             entrada.shift(); 
             regra_aplicada = "Erro sintático";
         }
+        tabela_sintatica[a].push(regra_aplicada);
+        a++;
     }
 
     // Adiciona a última linha com a regra final
-    tabela_sintatica.push([pilha.slice().reverse().join(' '), entrada.join(' '), regra_aplicada]);
+    tabela_sintatica.push([pilha.slice().reverse().join(' '), entrada.join(' ')]);
 
     if (errors_list.length === 0) {
         console.log("Código Válido");
@@ -514,9 +531,9 @@ function Compilar(){
     analizador_lexico();
     analizador_sintatico();
 
-    // if(errors_list == ""){
-    //     alert("Compilado sem erros");
-    // }else{
-    //     alert("Error");
-    // }
+    if(errors_list == ""){
+        alert("Compilado sem erros");
+    }else{
+        alert("Error");
+    }
 }
