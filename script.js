@@ -529,8 +529,11 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
     }else if(tipo === "ER"){
         errors_list.push(["Error",`(${token}) pula`]);
     }else{
+        if (pilha[pilha.length - 1] === ")" && token === "do"){
+            errors_list.push([token,"Não fechou parentesis no comando while"]);
+        }
         if (pilha[pilha.length - 1] === token){
-        errors_list.push(["Error",`(${pilha[pilha.length - 1]}) pula e (${token}) é esperado`]);
+        console.log("a")
     }
 }
 }
