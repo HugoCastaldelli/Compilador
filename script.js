@@ -507,12 +507,12 @@ function analizador_sintatico() {
     } else {
         let error_table = table_content;
         errors_list.forEach(erro => {
-            let dados_originais = table_content.find(row => row[0] === erro);
-    
+            let dados_originais = table_content.find(row => row[0] === erro[0]);
+
             if (dados_originais) {
-                error_table.push([erro, "Erro sintático", ...dados_originais.slice(2)]);
+                error_table.push([erro[0],erro[1], ...dados_originais.slice(2)]);
             } else {
-                error_table.push([erro, "Erro sintático"]);
+                error_table.push([erro[0], erro[1]]);
             }
         });
     
@@ -530,12 +530,17 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
         errors_list.push(["Error",`(${token}) pula`]);
     }else{
         if (pilha[pilha.length - 1] === ")" && token === "do"){
-            errors_list.push([token,"Não fechou parentesis no comando while"]);
+            errors_list.push(["while", "Erro: falta )"]);
+        }else if(pilha[pilha.length - 1] === "then" && token === ")"){
+            errors_list.push(["if", "Erro: falta ("]);
+        }else if(pilha[pilha.length - 1] === ")" && token === "then"){
+            errors_list.push(["if", "Erro: falta )"]);
+        }else if(pilha[pilha.length - 1] === "do" && token === ")"){
+            errors_list.push(["while", "Erro: falta ("]);
+        }else{
+            errors_list.push(["a","a"]);
         }
-        if (pilha[pilha.length - 1] === token){
-        console.log("a")
-    }
-}
+    }   
 }
 
 function Compilar(){
