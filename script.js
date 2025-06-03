@@ -527,7 +527,11 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
     if (tipo === "SINC"){
         errors_list.push(["Error", "SINC"]);
     }else if(tipo === "ER"){
-        errors_list.push(["Error",`(${token}) pula`]);
+        if(pilha[pilha.length - 1] === "COND*" && token === "."){
+            errors_list.push(["end","Erro: Comando não terminado"]);
+        }else{
+            errors_list.push(["a","a"]);
+        }
     }else{
         if (pilha[pilha.length - 1] === ")" && token === "do"){
             errors_list.push(["while", "Erro: falta )"]);
