@@ -484,12 +484,12 @@ function analizador_sintatico() {
                 Tratamento_Erro(errors_list,pilha,token_original,"SINC");
                 pilha.pop();
             }else{
-                regra_aplicada = `Erro: (${token_original}) pula`;
+                regra_aplicada = `Erro: \"${token_original}\" pula`;
                 Tratamento_Erro(errors_list,pilha,token_original,"ER");
                 entrada.shift();
             }
         }else{
-            regra_aplicada = `Erro: (${pilha[pilha.length - 1]}) pula (${token_original}) esperado`;
+            regra_aplicada = `Erro: \"${pilha[pilha.length - 1]}\" pula (${token_original}) esperado`;
             Tratamento_Erro(errors_list,pilha,token_original,"TOKEN");
             pilha.pop();
         }
@@ -529,8 +529,8 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
     }else if(tipo === "ER"){
         if(pilha[pilha.length - 1] === "COND*" && token === "."){
             errors_list.push(["end","Erro: Comando não terminado"]);
-        }else{
-            errors_list.push([token, `Erro: (${token}) pula`]);
+        }else if(pilha[pilha.length - 1] === "T*" && token === "c"){
+            errors_list.push([token, "Erro: falta \";\""]);
         }
     }else{
         if (pilha[pilha.length - 1] === ")" && token === "do"){
@@ -541,8 +541,8 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["if", "Erro: falta )"]);
         }else if(pilha[pilha.length - 1] === "do" && token === ")"){
             errors_list.push(["while", "Erro: falta ("]);
-        }else{
-            errors_list.push([token,`Erro: (${pilha[pilha.length - 1]}) pula (${token}) esperado`]);
+        }else if(pilha[pilha.length - 1] === "." && token === "$"){
+            errors_list.push([".","Erro: falta finalizar"]);
         }
     }   
 }
