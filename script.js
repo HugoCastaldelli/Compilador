@@ -530,7 +530,7 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
         if(pilha[pilha.length - 1] === "COND*" && token === "."){
             errors_list.push(["end","Erro: Comando não terminado"]);
         }else{
-            errors_list.push(["a","a"]);
+            errors_list.push([token, `Erro: (${token}) pula`]);
         }
     }else{
         if (pilha[pilha.length - 1] === ")" && token === "do"){
@@ -542,7 +542,7 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
         }else if(pilha[pilha.length - 1] === "do" && token === ")"){
             errors_list.push(["while", "Erro: falta ("]);
         }else{
-            errors_list.push(["a","a"]);
+            errors_list.push([token,`Erro: (${pilha[pilha.length - 1]}) pula (${token}) esperado`]);
         }
     }   
 }
