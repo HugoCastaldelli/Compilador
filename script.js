@@ -542,7 +542,9 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
         }else if(pilha[pilha.length - 1] === "do" && token === ")"){
             errors_list.push(["while", "Erro: falta ("]);
         }else if(pilha[pilha.length - 1] === "." && token === "$"){
-            errors_list.push([".","Erro: falta finalizar"]);
+            errors_list.push(["end","Erro: falta \".\""]);
+        }else if ((pilha[pilha.length - 1] === ";" && token === "int") || (pilha[pilha.length - 1] === ";" && token === "boolean")){
+            errors_list.push(["correto","Erro: falta \";\""]);
         }
     }   
 }
