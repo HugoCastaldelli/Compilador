@@ -531,6 +531,8 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["end","Erro: Comando não terminado"]);
         }else if(pilha[pilha.length - 1] === "T*" && token === "c"){
             errors_list.push([token, "Erro: falta \";\""]);
+        }else if(pilha[pilha.length - 1] === "LI*" && token === "int"){
+            errors_list.push([token, "Erro: falta \":\""]);
         }
     }else{
         if (pilha[pilha.length - 1] === ")" && token === "do"){
