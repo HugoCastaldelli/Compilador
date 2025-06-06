@@ -536,8 +536,8 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push([token, "Erro: falta \":\""]);
         }else if(pilha[pilha.length - 1] === "SPF" && token === "int"){
             errors_list.push([";", "Erro: falta \")\""]);
-        }else if(pilha[pilha.length - 1] === "LI*" && !reservedWords.includes(token) && pilha[pilha.length - 2] === ";" && pilha[pilha.length - 3] === "DV*"){
-             errors_list.push(["c", "Erro: falta \";\""]);
+        }else if(pilha[pilha.length - 1] === "LI*" && !reservedWords.includes(token) && pilha[pilha.length - 2] === ";" && pilha[pilha.length - 3] === "DV*" && pilha[pilha.length - 4] === "PDS" && pilha[pilha.length - 5] === "CC"){
+             errors_list.push(["c", "Erro: erro na atribução"]);
         }
     }else{
         if (pilha[pilha.length - 1] === ")" && token === "do"){
