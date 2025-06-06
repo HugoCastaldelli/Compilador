@@ -481,16 +481,16 @@ function analizador_sintatico() {
                 continue;
             } else if(producao === 'TOKEN_SYNC'){
                 regra_aplicada = `Erro SINC: remove ${topo_pilha}`;
-                Tratamento_Erro(errors_list,pilha,token,"SINC");
+                Tratamento_Erro(errors_list,pilha,token_original,"SINC");
                 pilha.pop();
             }else{
                 regra_aplicada = `Erro: \"${token_original}\" pula`;
-                Tratamento_Erro(errors_list,pilha,token,"ER");
+                Tratamento_Erro(errors_list,pilha,token_original,"ER");
                 entrada.shift();
             }
         }else{
             regra_aplicada = `Erro: \"${pilha[pilha.length - 1]}\" pula (${token_original}) esperado`;
-            Tratamento_Erro(errors_list,pilha,token,"TOKEN");
+            Tratamento_Erro(errors_list,pilha,token_original,"TOKEN");
             pilha.pop();
         }
         tabela_sintatica[a].push(regra_aplicada);
@@ -532,12 +532,12 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["end","Erro: Comando não terminado"]);
         }else if(pilha[pilha.length - 1] === "T*" && token === "ident"){
             errors_list.push([token, "Erro: falta \";\""]);
-        }else if(pilha[pilha.length - 1] === "LI*" && token === "int"){
+        }else if(pilha[pilha.length - 1] === "LI*" && token === "int" && pilha[pilha.length - 3] === "TIPO"){
             errors_list.push([token, "Erro: falta \":\""]);
         }else if(pilha[pilha.length - 1] === "SPF" && token === "int"){
             errors_list.push([";", "Erro: falta \")\""]);
-        }else if(pilha[pilha.length - 1] === "LI*" && token === "ident"){
-            errors_list.push(["c", "Erro: falta \")\""]);
+        }else if(pilha[pilha.length - 1] === "LI*" && !reservedWords.includes(token) && pilha[pilha.length - 2] === ";" && pilha[pilha.length - 3] === "DV*"){
+             errors_list.push(["c", "Erro: falta \";\""]);
         }
     }else{
         if (pilha[pilha.length - 1] === ")" && token === "do"){
