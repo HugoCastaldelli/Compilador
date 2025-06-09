@@ -481,16 +481,16 @@ function analizador_sintatico() {
                 continue;
             } else if(producao === 'TOKEN_SYNC'){
                 regra_aplicada = `Erro SINC: remove ${topo_pilha}`;
-                Tratamento_Erro(errors_list,pilha,token_original,"SINC");
+                Tratamento_Erro(errors_list,pilha,entrada,"SINC");
                 pilha.pop();
             }else{
                 regra_aplicada = `Erro: \"${token_original}\" pula`;
-                Tratamento_Erro(errors_list,pilha,token_original,"ER");
+                Tratamento_Erro(errors_list,pilha,entrada,"ER");
                 entrada.shift();
             }
         }else{
             regra_aplicada = `Erro: \"${pilha[pilha.length - 1]}\" pula (${token_original}) esperado`;
-            Tratamento_Erro(errors_list,pilha,token_original,"TOKEN");
+            Tratamento_Erro(errors_list,pilha,entrada,"TOKEN");
             pilha.pop();
         }
         tabela_sintatica[a].push(regra_aplicada);
@@ -528,30 +528,32 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
     if (tipo === "SINC"){
         errors_list.push(["Error", "SINC"]);
     }else if(tipo === "ER"){
-        if(pilha[pilha.length - 1] === "COND*" && token === "."){
+        if(pilha[pilha.length - 1] === "COND*" && token[0] === "."){
             errors_list.push(["end","Erro: Comando não terminado"]);
-        }else if(pilha[pilha.length - 1] === "T*" && token === "ident"){
-            errors_list.push([token, "Erro: falta \";\""]);
-        }else if(pilha[pilha.length - 1] === "LI*" && token === "int" && pilha[pilha.length - 3] === "TIPO"){
-            errors_list.push([token, "Erro: falta \":\""]);
-        }else if(pilha[pilha.length - 1] === "SPF" && token === "int"){
-            errors_list.push([";", "Erro: falta \")\""]);
-        }else if(pilha[pilha.length - 1] === "LI*" && !reservedWords.includes(token) && pilha[pilha.length - 2] === ";" && pilha[pilha.length - 3] === "DV*" && pilha[pilha.length - 4] === "PDS" && pilha[pilha.length - 5] === "CC"){
-             errors_list.push(["c", "Erro: erro na atribução"]);
+        }else if(pilha[pilha.length - 1] === "T*" && token[0] === "ident"){
+            errors_list.push([token[0], "Erro: falta \" ; \""]);
+        }else if(pilha[pilha.length - 1] === "LI*" && token[0] === "int" && pilha[pilha.length - 3] === "TIPO"){
+            errors_list.push([token[0], "Erro: falta \" : \""]);
+        }else if(pilha[pilha.length - 1] === "SPF" && token[0] === "int"){
+            errors_list.push([token[0], "Erro: falta \")\""]);
+        }else if((pilha[pilha.length - 1] === "LI*" && token[0] === "boolean") || (pilha[pilha.length - 1] === "LI*" && token[0] === "int")){
+             errors_list.push([token[0], "Erro: erro na atribução, falta \" ; \""]);
+        }else if (pilha[pilha.length - 1] === "LI*" && !reservedWords.includes(token[0]) && token[1] === ";" && pilha[pilha.length - 1] === "LI*" && pilha[pilha.length - 2] === ";" && pilha[pilha.length - 3] === "DV*"&& pilha[pilha.length - 4] === "PDS" && pilha[pilha.length - 5] === "CC" && pilha[pilha.length - 6] === "." && pilha[pilha.length - 7]){
+            errors_list.push([token[0], "Erro: erro na atribução, falta \" , \""]);
         }
     }else{
-        if (pilha[pilha.length - 1] === ")" && token === "do"){
+        if (pilha[pilha.length - 1] === ")" && token[0] === "do"){
             errors_list.push(["while", "Erro: falta )"]);
-        }else if(pilha[pilha.length - 1] === "then" && token === ")"){
+        }else if(pilha[pilha.length - 1] === "then" && token[0] === ")"){
             errors_list.push(["if", "Erro: falta ("]);
-        }else if(pilha[pilha.length - 1] === ")" && token === "then"){
+        }else if(pilha[pilha.length - 1] === ")" && token[0] === "then"){
             errors_list.push(["if", "Erro: falta )"]);
-        }else if(pilha[pilha.length - 1] === "do" && token === ")"){
+        }else if(pilha[pilha.length - 1] === "do" && token[0] === ")"){
             errors_list.push(["while", "Erro: falta ("]);
-        }else if(pilha[pilha.length - 1] === "." && token === "$"){
-            errors_list.push(["end","Erro: falta \".\""]);
-        }else if ((pilha[pilha.length - 1] === ";" && token === "int") || (pilha[pilha.length - 1] === ";" && token === "boolean")){
-            errors_list.push(["correto","Erro: falta \";\""]);
+        }else if(pilha[pilha.length - 1] === "." && token[0] === "$"){
+            errors_list.push(["end","Erro: falta \" . \""]);
+        }else if ((pilha[pilha.length - 1] === ";" && token[0] === "int") || (pilha[pilha.length - 1] === ";" && token[0] === "boolean")){
+            errors_list.push(["correto","Erro: falta \" ; \""]);
         }
     }   
 }
