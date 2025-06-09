@@ -530,7 +530,7 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
     }else if(tipo === "ER"){
         if(pilha[pilha.length - 1] === "COND*" && token[0] === "."){
             errors_list.push(["end","Erro: Comando não terminado"]);
-        }else if(pilha[pilha.length - 1] === "T*" && token[0] === "ident"){
+        }else if(pilha[pilha.length - 1] === "T*" && !reservedWords.includes(token[0]) && token[1] === ":=" && !reg_int.test(token[2])){
             errors_list.push([token[0], "Erro: falta \" ; \""]);
         }else if(pilha[pilha.length - 1] === "LI*" && token[0] === "int" && pilha[pilha.length - 3] === "TIPO"){
             errors_list.push([token[0], "Erro: falta \" : \""]);
@@ -557,6 +557,12 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
         }
     }   
 }
+
+//faltam:
+    //todos de expressao (//4)
+    // Comando palavra reservada
+    // Comando atribuicao
+    //
 
 function Compilar(){
     table_container.innerText = "";
