@@ -546,7 +546,10 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push([token[0], "Erro: erro na atribução, falta \" , \""]);
         }else if (pilha[pilha.length - 1] === "DV*" && token[0] !== "procedure" && !reservedWords.includes(token[1]) && token[2] === "("){
             errors_list.push([token[0],`Erro de palavra reservada ${token[0]}`]);
-        } 
+        } else if(pilha[pilha.length - 1] === "C*" && token[0] === "="){
+            errors_list.push(["=", "Erro: := ao inves de ="]);
+
+        }
     }else{
         if (pilha[pilha.length - 1] === ")" && token[0] === "do"){
             errors_list.push(["while", "Erro: falta )"]);
