@@ -562,9 +562,7 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
 
 //faltam:
     //todos de expressao (//4)
-    // Comando palavra reservada
-    // Comando atribuicao
-    //
+
 
 function Compilar(){
     table_container.innerText = "";
