@@ -526,7 +526,11 @@ function analizador_sintatico() {
 function Tratamento_Erro(errors_list,pilha, token, tipo){
 
     if (tipo === "SINC"){
-        errors_list.push(["Error", "SINC"]);
+         if(pilha[pilha.length - 1] === "ES" && token[0] === ")"){
+            errors_list.push([token[0],"Erro na expressão"]);
+         }else if(pilha[pilha.length - 1] === "F" && token[0] === ";"){
+            errors_list.push(["*","Erro na expressão"]);
+         }
     }else if(tipo === "ER"){
         if(pilha[pilha.length - 1] === "COND*" && token[0] === "."){
             errors_list.push(["end","Erro: Comando não terminado"]);
@@ -556,7 +560,9 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["end","Erro: falta \" . \""]);
         }else if ((pilha[pilha.length - 1] === ";" && token[0] === "int") || (pilha[pilha.length - 1] === ";" && token[0] === "boolean")){
             errors_list.push(["correto","Erro: falta \" ; \""]);
-        }  
+        } else if(pilha[pilha.length - 1] === ")" && token[0] === ";"){
+            errors_list.push([token[0], "Erro na expressão"]);
+        }
     }
 }
 
