@@ -232,6 +232,7 @@ function generateTokens(){
     return tokens;
 }
 
+
 function generateTableContent(code) {
     const table_content = [["Lexema", "Token", "Linha", "Coluna Inicio", "Coluna Fim"]];
 
@@ -548,7 +549,8 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push([token[0],`Erro de palavra reservada ${token[0]}`]);
         } else if(pilha[pilha.length - 1] === "C*" && token[0] === "="){
             errors_list.push(["=", "Erro: Atribuicao com operador errado"]);
-
+        } else if(pilha[pilha.length - 1] === "T*" && token[0] === "begin"){
+            errors_list.push([token[0], "Erro: falta \'do\'"]);
         }
     }else{
         if (pilha[pilha.length - 1] === ")" && token[0] === "do"){
@@ -557,7 +559,7 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["if", "Erro: falta ("]);
         }else if(pilha[pilha.length - 1] === ")" && token[0] === "then"){
             errors_list.push(["if", "Erro: falta )"]);
-        }else if(pilha[pilha.length - 1] === "do" && token[0] === ")"){
+        }else if(pilha[pilha.length - 1] === "do" && token[0] === ")" && token[1] === "do"){
             errors_list.push(["while", "Erro: falta ("]);
         }else if(pilha[pilha.length - 1] === "." && token[0] === "$"){
             errors_list.push(["end","Erro: falta \" . \""]);
@@ -565,18 +567,34 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["correto","Erro: falta \" ; \""]);
         } else if(pilha[pilha.length - 1] === ")" && token[0] === ";"){
             errors_list.push([pilha[pilha.length - 1], "Erro na expressão"]);
+        } else if(pilha[pilha.length - 1] === "then" && token[0] === "end"){
+            errors_list.push([token[0], "Erro: falta \'then\'"]);
         }
     }
 }
 
-//faltam:
-    //todos de expressao (//4)
+/*
 
+
+
+
+
+
+    Logica da análise Semântica
+
+
+
+
+
+
+
+*/
 
 function Compilar(){
     table_container.innerText = "";
     analizador_lexico();
     analizador_sintatico();
+
 
     if(errors_list == ""){
         alert("Compilado sem erros");
