@@ -547,7 +547,7 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
         }else if (pilha[pilha.length - 1] === "DV*" && token[0] !== "procedure" && !reservedWords.includes(token[1]) && token[2] === "("){
             errors_list.push([token[0],`Erro de palavra reservada ${token[0]}`]);
         } else if(pilha[pilha.length - 1] === "C*" && token[0] === "="){
-            errors_list.push(["=", "Erro: := ao inves de ="]);
+            errors_list.push(["=", "Erro: Atribuicao com operador errado"]);
 
         }
     }else{
@@ -564,7 +564,7 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
         }else if ((pilha[pilha.length - 1] === ";" && token[0] === "int") || (pilha[pilha.length - 1] === ";" && token[0] === "boolean")){
             errors_list.push(["correto","Erro: falta \" ; \""]);
         } else if(pilha[pilha.length - 1] === ")" && token[0] === ";"){
-            errors_list.push([token[0], "Erro na expressão"]);
+            errors_list.push([pilha[pilha.length - 1], "Erro na expressão"]);
         }
     }
 }
