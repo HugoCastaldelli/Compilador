@@ -540,7 +540,9 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
              errors_list.push([token[0], "Erro: erro na atribução, falta \" ; \""]);
         }else if (pilha[pilha.length - 1] === "LI*" && !reservedWords.includes(token[0]) && token[1] === ";" && pilha[pilha.length - 1] === "LI*" && pilha[pilha.length - 2] === ";" && pilha[pilha.length - 3] === "DV*"&& pilha[pilha.length - 4] === "PDS" && pilha[pilha.length - 5] === "CC" && pilha[pilha.length - 6] === "." && pilha[pilha.length - 7]){
             errors_list.push([token[0], "Erro: erro na atribução, falta \" , \""]);
-        }
+        }else if (pilha[pilha.length - 1] === "DV*" && token[0] !== "procedure" && !reservedWords.includes(token[1]) && token[2] === "("){
+            errors_list.push([token[0],`Erro de palavra reservada ${token[0]}`]);
+        } 
     }else{
         if (pilha[pilha.length - 1] === ")" && token[0] === "do"){
             errors_list.push(["while", "Erro: falta )"]);
@@ -554,8 +556,8 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["end","Erro: falta \" . \""]);
         }else if ((pilha[pilha.length - 1] === ";" && token[0] === "int") || (pilha[pilha.length - 1] === ";" && token[0] === "boolean")){
             errors_list.push(["correto","Erro: falta \" ; \""]);
-        }
-    }   
+        }  
+    }
 }
 
 //faltam:
