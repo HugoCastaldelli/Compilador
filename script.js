@@ -601,26 +601,26 @@ function analise_semantica(){
 
     for (let i = 1; i < table_content.length; i++) { 
         let [lexema, token, linha, colIni, colFim] = table_content[i];
-
-        if (token === "variable") {
-            let proximo = table_content[i+1];
-            let depoisProximo = table_content[i+2];
-            let anterior = table_content[i-1];
+        let proximo = table_content[i+1];
+        let depoisProximo = table_content[i+2];
+        let anterior = table_content[i-1];
     
-            if (proximo && proximo[0] === ":" && depoisProximo && (depoisProximo[0] === "int" || depoisProximo[0] === "boolean")) {
-                table_content[i].push(...[depoisProximo[0], "", "variável", escopoAtual, "não"]);
+        if (token === "variable") {
 
-            }else if (anterior && anterior[1] === "reserved word program"){
-                table_content[i].push(...["", "", "programa", escopoAtual, ""]);
+            if (proximo && proximo[0] === ":" && depoisProximo && (depoisProximo[0] === "int" || depoisProximo[0] === "boolean")) {
+                table_content[i].push(...[depoisProximo[0], "-", "par", escopoAtual, "não"]);
+
+            }else if (anterior && anterior[0] === "program"){
+                table_content[i].push(...["-", "-", table_content[i][0], escopoAtual, "-"]);
             }
 
-        } else if (token === "procedure") {
-            escopoAtual = lexema; // Novo escopo
-            table_content[i].push("", "", "procedimento", escopoAtual, "");
+        } else if (lexema === "procedure") {
+            escopoAtual = proximo[0];
+            table_content[i].push("-", "-", "-","-", "-");
 
 
         } else {
-            table_content[i].push(...["", "", "","", ""]);
+            table_content[i].push(...["-", "-", "-","-", "-"]);
             
         }
     }
