@@ -594,42 +594,37 @@ function analise_semantica(){
     let code = editor.innerText;
     let no_comments_code = remove_comments(code);
     let table_content = generateTableContent(no_comments_code);
-    let tabela = [...table_content];
-    tabela[0].push(...["Tipo","Valor","Categoria","Escopo","Utilizada"]);
+    table_content[0].push(...["Tipo","Valor","Categoria","Escopo","Utilizada"]);
 
-    // 1. Percorre a tabela para identificar declarações de variáveis
-    for (let i = 1; i < table_content.length; i++) {
+    let variaveis = {};
+    let escopoAtual = "global";
+
+    for (let i = 1; i < table_content.length; i++) { 
         let [lexema, token, linha, colIni, colFim] = table_content[i];
 
-        // Detecta declaração: variável seguida de ":" e tipo
         if (token === "variable") {
-            // Procura ":" e tipo na mesma linha
             let proximo = table_content[i+1];
             let depoisProximo = table_content[i+2];
+            let anterior = table_content[i-1];
+    
             if (proximo && proximo[0] === ":" && depoisProximo && (depoisProximo[0] === "int" || depoisProximo[0] === "boolean")) {
-                variaveis[lexema] = {
-                    tipo: depoisProximo[0],
-                    categoria: "variável",
-                    escopo: escopoAtual,
-                    utilizada: "não",
-                    valor: ""
-                };
-                // Preenche as colunas na tabela
-                table_content[i].push(depoisProximo[0], "", "variável", escopoAtual, "não");
-            } else {
-                // Não é declaração, só uso
-                table_content[i].push("", "", "", "", "");
+                table_content[i].push(...[depoisProximo[0], "", "variável", escopoAtual, "não"]);
+
+            }else if (anterior && anterior[1] === "reserved word program"){
+                table_content[i].push(...["", "", "programa", escopoAtual, ""]);
             }
+
         } else if (token === "procedure") {
             escopoAtual = lexema; // Novo escopo
             table_content[i].push("", "", "procedimento", escopoAtual, "");
-        } else if (token === "integer" || token === "boolean") {
-            table_content[i].push(token, "", "tipo", escopoAtual, "");
+
+
         } else {
-            table_content[i].push("", "", "", "", "");
+            table_content[i].push(...["", "", "","", ""]);
+            
         }
     }
-
+    Tokenss = table_content;
 }       
 
 function Compilar(){
