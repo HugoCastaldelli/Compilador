@@ -611,9 +611,8 @@ function analise_semantica(){
     table_content[0].push(...["Tipo","Valor","Categoria","Escopo","Utilizada"]);
 
     let variaveis = [];
-
+    let erros_list = [];
     let tipoAtual = "";
-
     
     let escopoAtual = "global";
     let escopos = [escopoAtual]
@@ -622,23 +621,47 @@ function analise_semantica(){
         let [lexema, token, linha, colIni, colFim] = table_content[i];
         let proximo = table_content[i+1];
         let depoisProximo = table_content[i+2];
+        let depoisdepoisProximo = table_content[i+3];
         let anterior = table_content[i-1];
     
         if (token === "variable") {
 
-
             if (proximo && proximo[0] === ":" && depoisProximo && (depoisProximo[0] === "int" || depoisProximo[0] === "boolean")) {
                 table_content[i].push(...[depoisProximo[0], "-", "par", escopoAtual, "não"]);
-                variaveis.push({ nome: lexema, escopo: escopoAtual });
+                variaveis.push(lexema);
 
             }else if (anterior && anterior[0] === "program"){
                 table_content[i].push(...["-", "-", table_content[i][0], escopoAtual, "-"]);
 
             }else if((anterior && (anterior[0] === "boolean" || anterior[0] === "int")) || (proximo && proximo[0] === "," || anterior[0] === ",")) {
-                table_content[i].push(...[tipoAtual, "-", "var", escopoAtual, "não"]);
-                variaveis.push({ nome: lexema, escopo: escopoAtual });
-            }
 
+                if (!variaveis.includes(lexema)){
+                    table_content[i].push(...[tipoAtual, "-", "var", escopoAtual, "não"]);
+                    variaveis.push(lexema);
+                }else{
+                    table_content.push([lexema, "Erro de declaração: Variável já declarada"]);
+                }
+
+            }else if (proximo && proximo[0] === ":=" && depoisProximo) {
+                let valor = "";
+                if (depoisProximo[0] === "-"){
+                    valor = depoisProximo[0] *(-1);
+                }else{
+                    valor = depoisProximo[0];
+                }
+                for (let j = 1; j < table_content.length; j++) {
+                    if (table_content[j][0] === lexema && table_content[j][6] === "-" && table_content[j][9] === "não") {
+                        if ((table_content[j][5] === "boolean" && (depoisProximo[0] === "true" || depoisProximo[0] === "false")) || ((table_content[j][5] === "int" || reg_int.test(valor)))) {
+                            table_content[j][6] = valor
+                            table_content[j][9] = "sim";
+                        }else{
+                            table_content.push([lexema, "Erro de atribuição: tipo incompatível"]);
+                        }
+                    }
+                }
+            } else {
+                table_content[i].push("-", "-", "-", "-", "-");
+            }
         } else if (lexema === "procedure") {
             escopoAtual = proximo[0];
             escopos.push(escopoAtual);
@@ -657,10 +680,11 @@ function analise_semantica(){
         } else if((lexema === "int" || lexema === "boolean") && (anterior && anterior[0] !== ":" )){
             tipoAtual = lexema;
             table_content[i].push("-", "-", "-", "-", "-"); 
+        }else{
+            table_content[i].push("-", "-", "-", "-", "-");   
         }
-        console.log(escopoAtual)
     }
-
+    
     Tokenss = table_content;
 }       
 
