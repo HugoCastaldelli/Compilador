@@ -506,6 +506,7 @@ function analizador_sintatico() {
         tabela_sintatica[a].push("certo");
         table_container.innerText = "";
     } else {
+
         let error_table = table_content;
         errors_list.forEach(erro => {
             let dados_originais = table_content.find(row => row[0] === erro[0]);
@@ -516,7 +517,6 @@ function analizador_sintatico() {
                 error_table.push([erro[0], erro[1]]);
             }
         });
-    
         const tabela_filtrada = filtrarErrosETriangular(error_table);
         Erros = tabela_filtrada;
     }
@@ -525,12 +525,18 @@ function analizador_sintatico() {
 }
 
 function Tratamento_Erro(errors_list,pilha, token, tipo){
+    var teste = errors_list.filter(
+    e => (e[0] === "Erro" && e[1] === "Erro sintático"));
 
     if (tipo === "SINC"){
          if(pilha[pilha.length - 1] === "ES" && token[0] === ")"){
             errors_list.push([token[0],"Erro na expressão"]);
          }else if(pilha[pilha.length - 1] === "F" && token[0] === ";"){
             errors_list.push(["*","Erro na expressão"]);
+         }else{
+            if (teste.length === 0){
+                errors_list.push(["Erro","Erro sintático"]);
+            }
          }
     }else if(tipo === "ER"){
         if(pilha[pilha.length - 1] === "COND*" && token[0] === "."){
@@ -551,6 +557,10 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["=", "Erro: Atribuicao com operador errado"]);
         } else if(pilha[pilha.length - 1] === "T*" && token[0] === "begin"){
             errors_list.push([token[0], "Erro: falta \'do\'"]);
+        } else{
+            if (teste.length === 0){
+                errors_list.push(["Erro","Erro sintático"]);
+            }
         }
     }else{
         if (pilha[pilha.length - 1] === ")" && token[0] === "do"){
@@ -569,6 +579,10 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push([pilha[pilha.length - 1], "Erro na expressão"]);
         } else if(pilha[pilha.length - 1] === "then" && token[0] === "end"){
             errors_list.push([token[0], "Erro: falta \'then\'"]);
+        }else{
+            if (teste.length === 0){
+                errors_list.push(["Erro","Erro sintático"]);
+            }
         }
     }
 }
@@ -596,8 +610,13 @@ function analise_semantica(){
     let table_content = generateTableContent(no_comments_code);
     table_content[0].push(...["Tipo","Valor","Categoria","Escopo","Utilizada"]);
 
-    let variaveis = {};
+    let variaveis = [];
+
+    let tipoAtual = "";
+
+    
     let escopoAtual = "global";
+    let escopos = [escopoAtual]
 
     for (let i = 1; i < table_content.length; i++) { 
         let [lexema, token, linha, colIni, colFim] = table_content[i];
@@ -607,23 +626,41 @@ function analise_semantica(){
     
         if (token === "variable") {
 
+
             if (proximo && proximo[0] === ":" && depoisProximo && (depoisProximo[0] === "int" || depoisProximo[0] === "boolean")) {
                 table_content[i].push(...[depoisProximo[0], "-", "par", escopoAtual, "não"]);
+                variaveis.push({ nome: lexema, escopo: escopoAtual });
 
             }else if (anterior && anterior[0] === "program"){
                 table_content[i].push(...["-", "-", table_content[i][0], escopoAtual, "-"]);
+
+            }else if((anterior && (anterior[0] === "boolean" || anterior[0] === "int")) || (proximo && proximo[0] === "," || anterior[0] === ",")) {
+                table_content[i].push(...[tipoAtual, "-", "var", escopoAtual, "não"]);
+                variaveis.push({ nome: lexema, escopo: escopoAtual });
             }
 
         } else if (lexema === "procedure") {
             escopoAtual = proximo[0];
-            table_content[i].push("-", "-", "-","-", "-");
+            escopos.push(escopoAtual);
+            table_content[i].push("-", "-", "-", "-", "-");
 
+        } else if (lexema === "end" && (proximo && proximo[0] !== "else")) {
+            escopos.pop();
+            escopoAtual = escopos[escopos.length - 1];
+            table_content[i].push("-", "-", "-", "-", "-");
 
-        } else {
-            table_content[i].push(...["-", "-", "-","-", "-"]);
+        } else if (lexema === "begin" && anterior && (anterior[0] === "do" || anterior[0] === "then")) {
+            escopoAtual = anterior[0] + "_" + linha;
+            escopos.push(escopoAtual);
+            table_content[i].push("-", "-", "-", "-", "-"); 
             
+        } else if((lexema === "int" || lexema === "boolean") && (anterior && anterior[0] !== ":" )){
+            tipoAtual = lexema;
+            table_content[i].push("-", "-", "-", "-", "-"); 
         }
+        console.log(escopoAtual)
     }
+
     Tokenss = table_content;
 }       
 
