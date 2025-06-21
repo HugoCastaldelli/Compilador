@@ -618,72 +618,89 @@ function analise_semantica(){
     let escopos = [escopoAtual]
 
     for (let i = 1; i < table_content.length; i++) { 
-        let [lexema, token, linha, colIni, colFim] = table_content[i];
-        let proximo = table_content[i+1];
-        let depoisProximo = table_content[i+2];
-        let depoisdepoisProximo = table_content[i+3];
-        let anterior = table_content[i-1];
-    
-        if (token === "variable") {
+    let [lexema, token, linha, colIni, colFim] = table_content[i];
+    let proximo = table_content[i+1];
+    let depoisProximo = table_content[i+2];
+    let depoisdepoisProximo = table_content[i+3];
+    let anterior = table_content[i-1];
 
-            if (proximo && proximo[0] === ":" && depoisProximo && (depoisProximo[0] === "int" || depoisProximo[0] === "boolean")) {
-                table_content[i].push(...[depoisProximo[0], "-", "par", escopoAtual, "não"]);
+    if (token === "variable") {
+
+        //  Caso: Declaração de parâmetro de procedimento (exemplo: x: int)
+        if (proximo && proximo[0] === ":" && depoisProximo && (depoisProximo[0] === "int" || depoisProximo[0] === "boolean")) {
+            table_content[i].push(...[depoisProximo[0], "-", "par", escopoAtual, "não"]);
+            variaveis.push(lexema);
+
+        //  Caso: Nome do programa (exemplo: program exemplo)
+        } else if (anterior && anterior[0] === "program") {
+            table_content[i].push(...["-", "-", table_content[i][0], escopoAtual, "-"]);
+
+        //  Caso: Declaração de variável (exemplo: int x, y, z;)
+        } else if((anterior && (anterior[0] === "boolean" || anterior[0] === "int")) || (proximo && proximo[0] === "," || anterior[0] === ",")) {
+
+            if (!variaveis.includes(lexema)){
+                table_content[i].push(...[tipoAtual, "-", "var", escopoAtual, "não"]);
                 variaveis.push(lexema);
+            } else {
+                table_content.push([lexema, "Erro de declaração: Variável já declarada"]);
+            }
 
-            }else if (anterior && anterior[0] === "program"){
-                table_content[i].push(...["-", "-", table_content[i][0], escopoAtual, "-"]);
+        //  Caso: Atribuição de valor (exemplo: x := 5;)
+        } else if (proximo && proximo[0] === ":=" && depoisProximo) {
+            let valor = "";
+            if (depoisProximo[0] === "-") {
+                valor = depoisProximo[0] * (-1); // Negativo, por exemplo: -5
+            } else {
+                valor = depoisProximo[0];
+            }
 
-            }else if((anterior && (anterior[0] === "boolean" || anterior[0] === "int")) || (proximo && proximo[0] === "," || anterior[0] === ",")) {
-
-                if (!variaveis.includes(lexema)){
-                    table_content[i].push(...[tipoAtual, "-", "var", escopoAtual, "não"]);
-                    variaveis.push(lexema);
-                }else{
-                    table_content.push([lexema, "Erro de declaração: Variável já declarada"]);
-                }
-
-            }else if (proximo && proximo[0] === ":=" && depoisProximo) {
-                let valor = "";
-                if (depoisProximo[0] === "-"){
-                    valor = depoisProximo[0] *(-1);
-                }else{
-                    valor = depoisProximo[0];
-                }
-                for (let j = 1; j < table_content.length; j++) {
-                    if (table_content[j][0] === lexema && table_content[j][6] === "-" && table_content[j][9] === "não") {
-                        if ((table_content[j][5] === "boolean" && (depoisProximo[0] === "true" || depoisProximo[0] === "false")) || ((table_content[j][5] === "int" || reg_int.test(valor)))) {
-                            table_content[j][6] = valor
-                            table_content[j][9] = "sim";
-                        }else{
-                            table_content.push([lexema, "Erro de atribuição: tipo incompatível"]);
-                        }
+            // Procura a variável na tabela para atualizar valor e marcar como utilizada
+            for (let j = 1; j < table_content.length; j++) {
+                if (table_content[j][0] === lexema && table_content[j][6] === "-" && table_content[j][9] === "não") {
+                    if ((table_content[j][5] === "boolean" && (depoisProximo[0] === "true" || depoisProximo[0] === "false")) || 
+                        ((table_content[j][5] === "int" || reg_int.test(valor)))) {
+                        table_content[j][6] = valor;
+                        table_content[j][9] = "sim";
+                    } else {
+                        table_content.push([lexema, "Erro de atribuição: tipo incompatível"]);
                     }
                 }
-            } else {
-                table_content[i].push("-", "-", "-", "-", "-");
             }
+
+        //  Caso: Outras ocorrências de variável (não identificadas nas condições acima)
+        } else {
+            table_content[i].push("-", "-", "-", "-", "-");
+        }
+
+        //  Caso: Início de um procedimento (exemplo: procedure soma)
         } else if (lexema === "procedure") {
-            escopoAtual = proximo[0];
+            escopoAtual = proximo[0]; // Nome do procedimento vira o novo escopo
             escopos.push(escopoAtual);
             table_content[i].push("-", "-", "-", "-", "-");
 
+        //  Caso: Fim de um escopo (end de um procedimento ou bloco)
         } else if (lexema === "end" && (proximo && proximo[0] !== "else")) {
             escopos.pop();
             escopoAtual = escopos[escopos.length - 1];
             table_content[i].push("-", "-", "-", "-", "-");
 
+        //  Caso: Novo escopo interno de bloco (exemplo: begin dentro de um if ou while)
         } else if (lexema === "begin" && anterior && (anterior[0] === "do" || anterior[0] === "then")) {
-            escopoAtual = anterior[0] + "_" + linha;
+            escopoAtual = anterior[0] + "_" + linha;  // Nomeia o escopo com base no comando (do/then) e na linha
             escopos.push(escopoAtual);
             table_content[i].push("-", "-", "-", "-", "-"); 
-            
+
+        //  Caso: Mudança do tipo atual para declaração de variáveis (exemplo: int ou boolean)
         } else if((lexema === "int" || lexema === "boolean") && (anterior && anterior[0] !== ":" )){
             tipoAtual = lexema;
             table_content[i].push("-", "-", "-", "-", "-"); 
-        }else{
+
+        //  Caso geral (tokens que não alteram tipo, escopo ou variáveis)
+        } else {
             table_content[i].push("-", "-", "-", "-", "-");   
         }
     }
+
     
     Tokenss = table_content;
 }       
