@@ -645,33 +645,27 @@ function analise_semantica(){
                 table_content.push([lexema, "Erro de declaração: Variável já declarada"]);
             }
 
-        //  Caso: Atribuição de valor (exemplo: x := 5;)
-        } else if (proximo && proximo[0] === ":=" && depoisProximo) {
-            let error = true;
-                // Procura a variável na tabela para atualizar valor e marcar como utilizada
-                for (let j = 1; j < table_content.length; j++) {
-                    if (table_content[j][0] === lexema && table_content[j][6] === "-" && table_content[j][9] === "não") {
-                        if (table_content[j][5] === "boolean" && (depoisProximo[0] === "true" || depoisProximo[0] === "false")) {
-                            table_content[j][6] = depoisProximo[0];
-                            table_content[j][9] = "sim";
-                            error = false;
-                            break;
-                        } else if (table_content[j][5] === "int" && reg_int.test(depoisProximo[0])) {
-                            table_content[j][6] = depoisProximo[0];
-                            table_content[j][9] = "sim";
-                            error = false;
-                            break;
-                        } else if (table_content[j][5] === "int" && depoisProximo[0] === "-") {
-                            table_content[j][6] = String(depoisProximo[0]) + String(depoisdepoisProximo[0]);
-                            table_content[j][9] = "sim";
-                            error = false;
-                            break;
+        //  Caso: Atribuição de valor (exemplo: x := false;)
+        } else if ((proximo && proximo[0] === ":=") && depoisProximo && (((depoisProximo[0] === "true" || depoisProximo[0] === "false")) || depoisProximo[1] === "integer" || depoisProximo[1] === "operator")) {
+                table_content.find((row) => {
+                    if (row[0] === lexema && (row[5] || row[5] !== "-")){
+                        if (row[5] === "boolean") {
+                            row[9] = "sim";
+                            table_content[i].push(...["-", depoisProximo[0], "-", "-", "-"]);
+                        }else if (row[5] === "int" && depoisProximo[1] === "integer") {
+                            row[9] = "sim";
+                            table_content[i].push(...["-", depoisProximo[0], "-", "-", "-"]);
+                        }else if(row[5] === "int" && depoisProximo[0] === "+"){
+                            row[9] = "sim";
+                            table_content[i].push(...["-", depoisdepoisProximo[0], "-", "-", "-"]);
+                        }
+                        else if(row[5] === "int" && depoisProximo[0] === "-"){
+                            row[9] = "sim";
+                            table_content[i].push(...["-", depoisdepoisProximo[0] * (-1), "-", "-", "-"]);
                         }
                     }
-                }
-                if (error) {
-                    table_content.push([lexema, "Erro de atribuição: Tipo incompatível"]);
-                }
+                });
+
         //  Caso: Outras ocorrências de variável (não identificadas nas condições acima)
         } else {
             table_content[i].push("-", "-", "-", "-", "-");
@@ -700,7 +694,7 @@ function analise_semantica(){
             tipoAtual = lexema;
             table_content[i].push("-", "-", "-", "-", "-"); 
 
-        } else if (reg_int.test(lexema)) {
+         } else if (reg_int.test(lexema)) {
             //  Caso: Número inteiro literal
             table_content[i].push("int", lexema, "literal", "-", "-");
 
