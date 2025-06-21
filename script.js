@@ -647,19 +647,13 @@ function analise_semantica(){
 
         //  Caso: Atribuição de valor (exemplo: x := 5;)
         } else if (proximo && proximo[0] === ":=" && depoisProximo) {
-            let valor = "";
-            if (depoisProximo[0] === "-") {
-                valor = depoisProximo[0] * (-1); // Negativo, por exemplo: -5
-            } else {
-                valor = depoisProximo[0];
-            }
-
+            
             // Procura a variável na tabela para atualizar valor e marcar como utilizada
             for (let j = 1; j < table_content.length; j++) {
                 if (table_content[j][0] === lexema && table_content[j][6] === "-" && table_content[j][9] === "não") {
                     if ((table_content[j][5] === "boolean" && (depoisProximo[0] === "true" || depoisProximo[0] === "false")) || 
-                        ((table_content[j][5] === "int" || reg_int.test(valor)))) {
-                        table_content[j][6] = valor;
+                        (table_content[j][5] === "int" && reg_int.test(valor))) {
+                        table_content[j][6] = depoisProximo[0]; // Atualiza o valor
                         table_content[j][9] = "sim";
                     } else {
                         table_content.push([lexema, "Erro de atribuição: tipo incompatível"]);
