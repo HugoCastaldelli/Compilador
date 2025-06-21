@@ -700,6 +700,14 @@ function analise_semantica(){
             tipoAtual = lexema;
             table_content[i].push("-", "-", "-", "-", "-"); 
 
+        } else if (reg_int.test(lexema)) {
+            //  Caso: Número inteiro literal
+            table_content[i].push("int", lexema, "literal", "-", "-");
+
+        } else if (lexema === "true" || lexema === "false") {
+            //  Caso: Booleano literal
+            table_content[i].push("boolean", lexema, "literal", "-", "-");
+
         //  Caso geral (tokens que não alteram tipo, escopo ou variáveis)
         } else {
             table_content[i].push("-", "-", "-", "-", "-");   
