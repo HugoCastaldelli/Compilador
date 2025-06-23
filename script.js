@@ -36,6 +36,13 @@ analisador_btn.addEventListener("click", function() {
     table_container.appendChild(create_table(Analisador_preditivo));
 });
 
+document.getElementById("codigo_btn").addEventListener("click", function() {
+    table_container.innerText = "";
+    gerar_codigo_intermediario();
+    table_container.appendChild(create_table(CodigoIntermediario));
+});
+
+
 document.getElementById("dowload_btn").addEventListener("click", function() {
     var conteudo = editor.innerText;
     
@@ -753,11 +760,68 @@ function analise_semantica(){
     Tokenss = table_content;
 }       
 
+let CodigoIntermediario = [];
+
+function gerar_codigo_intermediario() {
+    CodigoIntermediario = [["Instrucao", "Argumento"]]; // Cabeçalho da tabela
+
+    // Início do programa
+    CodigoIntermediario.push(["INPP", ""]);
+
+    // Busca todas variáveis declaradas (da análise semântica)
+    const variaveis = Tokenss.filter(row => row[6] === "var");
+    CodigoIntermediario.push(["INTEGER", ""]);
+    CodigoIntermediario.push(["AMEM", variaveis.length.toString()]);
+
+    for (let i = 1; i < Tokenss.length; i++) {
+        const [lexema, token, , , , tipo, , categoria] = Tokenss[i];
+
+        if (token === "reserved word read") {
+            CodigoIntermediario.push(["LEIT", ""]);
+            const prox = Tokenss[i + 2]; // espera-se "read ( var )"
+            const indexVar = variaveis.findIndex(v => v[0] === prox[0]);
+            CodigoIntermediario.push(["ARMZ", indexVar.toString()]);
+        }
+
+        if (token === "variable" && Tokenss[i + 1] && Tokenss[i + 1][0] === ":=") {
+            const varIndex = variaveis.findIndex(v => v[0] === lexema);
+            const valorToken = Tokenss[i + 2];
+            if (valorToken[1] === "integer") {
+                CodigoIntermediario.push(["CRCT", valorToken[0]]);
+                CodigoIntermediario.push(["ARMZ", varIndex.toString()]);
+            } else if (valorToken[1] === "variable") {
+                const origem = variaveis.findIndex(v => v[0] === valorToken[0]);
+                CodigoIntermediario.push(["CRVL", origem.toString()]);
+                CodigoIntermediario.push(["ARMZ", varIndex.toString()]);
+            } else if (valorToken[1] === "operator" && (valorToken[0] === "*" || valorToken[0] === "+" || valorToken[0] === "-")) {
+                const op = valorToken[0];
+                const op1 = Tokenss[i + 2], op2 = Tokenss[i + 4];
+                const op1idx = variaveis.findIndex(v => v[0] === op1[0]);
+                const op2idx = variaveis.findIndex(v => v[0] === op2[0]);
+                CodigoIntermediario.push(["CRVL", op1idx.toString()]);
+                CodigoIntermediario.push(["CRVL", op2idx.toString()]);
+                CodigoIntermediario.push([op === "*" ? "MULT" : op === "+" ? "SOMA" : "SUBT", ""]);
+                CodigoIntermediario.push(["ARMZ", varIndex.toString()]);
+            }
+        }
+
+        if (token === "reserved word write") {
+            const prox = Tokenss[i + 2]; // write ( x )
+            const varIndex = variaveis.findIndex(v => v[0] === prox[0]);
+            CodigoIntermediario.push(["CRVL", varIndex.toString()]);
+            CodigoIntermediario.push(["IMPR", ""]);
+        }
+    }
+
+    CodigoIntermediario.push(["PARA", ""]);
+}
+
 function Compilar(){
     table_container.innerText = "";
     analizador_lexico();
     analizador_sintatico();
     analise_semantica();
+    gerar_codigo_intermediario();
 
     if(errors_list == ""){
         alert("Compilado sem erros");
@@ -765,3 +829,4 @@ function Compilar(){
         alert("Error");
     }
 }
+
