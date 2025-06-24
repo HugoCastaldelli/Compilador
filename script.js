@@ -763,52 +763,66 @@ function analise_semantica(){
 let CodigoIntermediario = [];
 
 function gerar_codigo_intermediario() {
-    CodigoIntermediario = [["Instrucao", "Argumento"]]; // Cabeçalho da tabela
+    CodigoIntermediario = [["Instrucao", "Argumento"]];
 
-    // Início do programa
     CodigoIntermediario.push(["INPP", ""]);
 
-    // Busca todas variáveis declaradas (da análise semântica)
-    const variaveis = Tokenss.filter(row => row[6] === "var");
-    CodigoIntermediario.push(["INTEGER", ""]);
-    CodigoIntermediario.push(["AMEM", variaveis.length.toString()]);
+    let mapaVariaveis = {};
+    let memoriaIndex = 0;
 
+    // Passo 1: emitir AMEM por variável declarada
     for (let i = 1; i < Tokenss.length; i++) {
-        const [lexema, token, , , , tipo, , categoria] = Tokenss[i];
-
-        if (token === "reserved word read") {
-            CodigoIntermediario.push(["LEIT", ""]);
-            const prox = Tokenss[i + 2]; // espera-se "read ( var )"
-            const indexVar = variaveis.findIndex(v => v[0] === prox[0]);
-            CodigoIntermediario.push(["ARMZ", indexVar.toString()]);
+        const [lexema, token, , , , , , categoria] = Tokenss[i];
+        if (token === "variable" && categoria === "var" && mapaVariaveis[lexema] === undefined) {
+            mapaVariaveis[lexema] = memoriaIndex;
+            memoriaIndex++;
+            CodigoIntermediario.push(["AMEM", "1"]);
         }
+    }
 
+    // Passo 2: gerar instruções com base no código
+    for (let i = 1; i < Tokenss.length; i++) {
+        const [lexema, token] = Tokenss[i];
+
+        // Atribuição simples: x := valor
         if (token === "variable" && Tokenss[i + 1] && Tokenss[i + 1][0] === ":=") {
-            const varIndex = variaveis.findIndex(v => v[0] === lexema);
-            const valorToken = Tokenss[i + 2];
-            if (valorToken[1] === "integer") {
-                CodigoIntermediario.push(["CRCT", valorToken[0]]);
+            const varNome = lexema;
+            const varIndex = mapaVariaveis[varNome];
+            const proximo = Tokenss[i + 2];
+
+            if (proximo[1] === "integer") {
+                CodigoIntermediario.push(["CRCT", proximo[0]]);
                 CodigoIntermediario.push(["ARMZ", varIndex.toString()]);
-            } else if (valorToken[1] === "variable") {
-                const origem = variaveis.findIndex(v => v[0] === valorToken[0]);
+            } else if (proximo[1] === "variable") {
+                const origem = mapaVariaveis[proximo[0]];
                 CodigoIntermediario.push(["CRVL", origem.toString()]);
                 CodigoIntermediario.push(["ARMZ", varIndex.toString()]);
-            } else if (valorToken[1] === "operator" && (valorToken[0] === "*" || valorToken[0] === "+" || valorToken[0] === "-")) {
-                const op = valorToken[0];
-                const op1 = Tokenss[i + 2], op2 = Tokenss[i + 4];
-                const op1idx = variaveis.findIndex(v => v[0] === op1[0]);
-                const op2idx = variaveis.findIndex(v => v[0] === op2[0]);
-                CodigoIntermediario.push(["CRVL", op1idx.toString()]);
-                CodigoIntermediario.push(["CRVL", op2idx.toString()]);
-                CodigoIntermediario.push([op === "*" ? "MULT" : op === "+" ? "SOMA" : "SUBT", ""]);
+            }
+
+            // Atribuição com soma: x := x + y
+            const operador = Tokenss[i + 3];
+            const operando2 = Tokenss[i + 4];
+            if (operador && operador[1] === "operator" && operador[0] === "+" && operando2) {
+                const origem2 = mapaVariaveis[operando2[0]];
+                CodigoIntermediario.push(["CRVL", origem2.toString()]);
+                CodigoIntermediario.push(["SOMA", ""]);
                 CodigoIntermediario.push(["ARMZ", varIndex.toString()]);
             }
         }
 
+        // Leitura
+        if (token === "reserved word read") {
+            const alvo = Tokenss[i + 2]; // read ( x )
+            const index = mapaVariaveis[alvo[0]];
+            CodigoIntermediario.push(["LEIT", ""]);
+            CodigoIntermediario.push(["ARMZ", index.toString()]);
+        }
+
+        // Escrita
         if (token === "reserved word write") {
-            const prox = Tokenss[i + 2]; // write ( x )
-            const varIndex = variaveis.findIndex(v => v[0] === prox[0]);
-            CodigoIntermediario.push(["CRVL", varIndex.toString()]);
+            const alvo = Tokenss[i + 2]; // write ( x )
+            const index = mapaVariaveis[alvo[0]];
+            CodigoIntermediario.push(["CRVL", index.toString()]);
             CodigoIntermediario.push(["IMPR", ""]);
         }
     }
@@ -830,3 +844,93 @@ function Compilar(){
     }
 }
 
+function interpretar_codigo(codigo) {
+    let memoria = [];
+    let pilha = [];
+    let output = [];
+
+    let instrucoes = codigo.slice(1); // Remove cabeçalho da tabela
+
+    let ip = 0; // Instruction pointer
+
+    function input_simulado() {
+        // Pode trocar por `prompt("Digite um valor:")`
+        return parseInt(prompt("Digite um número inteiro:"), 10);
+    }
+
+    while (ip < instrucoes.length) {
+        const [instrucao, argumento] = instrucoes[ip];
+
+        switch (instrucao) {
+            case "INPP":
+                memoria = [];
+                pilha = [];
+                break;
+
+            case "INTEGER":
+                break; // só decorativo no código intermediário
+
+            case "AMEM":
+                const tam = parseInt(argumento);
+                for (let i = 0; i < tam; i++) {
+                    memoria.push(0);
+                }
+                break;
+
+            case "LEIT":
+                const valor = input_simulado();
+                pilha.push(valor);
+                break;
+
+            case "CRCT":
+                pilha.push(parseInt(argumento));
+                break;
+
+            case "CRVL":
+                pilha.push(memoria[parseInt(argumento)]);
+                break;
+
+            case "ARMZ":
+                const idx = parseInt(argumento);
+                memoria[idx] = pilha.pop();
+                break;
+
+            case "MULT":
+                const op2 = pilha.pop();
+                const op1 = pilha.pop();
+                pilha.push(op1 * op2);
+                break;
+
+            case "SOMA":
+                pilha.push(pilha.pop() + pilha.pop());
+                break;
+
+            case "SUBT":
+                const b = pilha.pop();
+                const a = pilha.pop();
+                pilha.push(a - b);
+                break;
+
+            case "IMPR":
+                output.push(pilha.pop());
+                break;
+
+            case "PARA":
+                ip = instrucoes.length; // força parar
+                break;
+        }
+
+        ip++;
+    }
+
+    alert("Saída: " + output.join(", "));
+    return output;
+}
+
+document.getElementById("interpretar_btn").addEventListener("click", function() {
+    if (CodigoIntermediario.length === 0) {
+        alert("Código intermediário não gerado.");
+        return;
+    }
+    interpretar_codigo(CodigoIntermediario);
+});
