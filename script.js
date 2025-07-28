@@ -36,6 +36,13 @@ analisador_btn.addEventListener("click", function() {
     table_container.appendChild(create_table(Analisador_preditivo));
 });
 
+document.getElementById("codigo_btn").addEventListener("click", function() {
+    table_container.innerText = "";
+    gerar_codigo_intermediario();
+    table_container.appendChild(create_table(CodigoIntermediario));
+});
+
+
 document.getElementById("dowload_btn").addEventListener("click", function() {
     var conteudo = editor.innerText;
     
@@ -232,6 +239,7 @@ function generateTokens(){
     return tokens;
 }
 
+
 function generateTableContent(code) {
     const table_content = [["Lexema", "Token", "Linha", "Coluna Inicio", "Coluna Fim"]];
 
@@ -420,7 +428,48 @@ const TDV = [
     ['T*'     ,'ERROR'                  ,'ERROR'            , 'ERROR'          , 'ERROR'        , 'ε'            , 'ERROR'                      , 'ERROR'           , 'ERROR'            ,'ERROR'        ,'ERROR'        ,'ERROR'     , 'ERROR'     , 'ERROR'         , 'ε'            , 'ERROR'          , 'ε'            , 'ERROR'              ,  'ε'            , 'ε'             , 'ERROR'                   , 'ERROR'                , 'ERROR'  , 'ε'           , 'ε'            , 'ERROR'     , 'ERROR'      , 'ε'           , 'ε'            , 'ε'            , 'ε'            , 'ε'            , 'ε'          , 'ε'             , 'ε'            , 'ε'             , 'ε'             , 'OP3 F T*'     , 'OP3 F T*'      , 'OP3 F T*'      , 'ERROR'        , 'ERROR'],
     ['V'      ,'ERROR'                  ,'ERROR'            , 'ERROR'          , 'ERROR'        , 'TOKEN_SYNC'   , 'ERROR'                      , 'TOKEN_SYNC'      , 'ident V*'         ,'ERROR'        ,'ERROR'        ,'ERROR'     , 'ERROR'     , 'ERROR'         , 'TOKEN_SYNC'   , 'ERROR'          , 'ERROR'        , 'ERROR'              ,  'TOKEN_SYNC'   , 'TOKEN_SYNC'    , 'ERROR'                   , 'ERROR'                , 'ERROR'  , 'ERROR'       , 'ERROR'        , 'ERROR'     , 'ERROR'      , 'TOKEN_SYNC'  , 'TOKEN_SYNC'   , 'TOKEN_SYNC'   , 'TOKEN_SYNC'   , 'TOKEN_SYNC'   , 'TOKEN_SYNC' , 'TOKEN_SYNC'    , 'TOKEN_SYNC'   , 'TOKEN_SYNC'    , 'TOKEN_SYNC'    , 'TOKEN_SYNC'   , 'TOKEN_SYNC'    , 'TOKEN_SYNC'    , 'ERROR'        , 'ERROR'],
     ['V*'     ,'ERROR'                  ,'ERROR'            , 'ERROR'          , 'ERROR'        , 'ε'            , 'ERROR'                      , 'ε'               , 'ε'                ,'ERROR'        ,'ERROR'        ,'ERROR'     , 'ERROR'     , 'ERROR'          , 'ε'            , 'ERROR'          , 'ε'            , 'ERROR'              ,  'ε'            , 'ε'             , 'ERROR'                   , 'ERROR'                , 'ε'      , 'ε'           , 'ε'            , 'ERROR'     , 'ERROR'      , 'ε'           , 'ε'            , 'ε'            , 'ε'            , 'ε'            , 'ε'          , 'ε'             , 'ε'            , 'ε'             , 'ε'             , 'ERROR'        , 'ε'             , 'ERROR'         , '[ E ]'       , 'ERROR'],
-    
+    [],
+    [],
+    [],
+    ['Legenda'],
+    [],
+    ['P'      ,'Programa'],
+    ['B'      ,'Bloco'],
+    ['PDV'    ,'Parte de declaração de variavel'],
+    ['DV'     ,'Declaração de variável'],
+    ['DV*'    ,'Declaração de variável (recursão)'],
+    ['TIPO'   ,'Tipo'],
+    ['LI'     ,'Lista de Identificadores'],
+    ['LI*'    ,'Lista de Identificadores (recursão)'],
+    ['PDS'    ,'Parte de Declarações de Subprogramas'],
+    ['DP*'    ,'Declaração de Procedimento (recursão)'],
+    ['DP'     ,'Declaração de Procedimento'],
+    ['PF'     ,'Parâmetros Formais'],
+    ['SPF'    ,'Subparte de Parâmetros Formais'],
+    ['SPF*'   ,'Subparte de Parâmetros Formais (recursão)'],
+    ['CC'     ,'Comando Composto'],
+    ['CC*'    ,'Comando Composto (recursão)'],
+    ['C'      ,'Comando'],
+    ['C*'     ,'Comando (recursão)'],
+    ['CP'     ,'Chamada de Procedimento'],
+    ['COND'   ,'Comando Condicional (if)'],
+    ['COND*'  ,'Comando Condicional (if) (recursão)'],
+    ['CR'     ,'Comando de Repetição (while)'],
+    ['LE'     ,'Lista de Expressões'],
+    ['E*'     ,'Expressão (recursão)'],
+    ['E'      ,'Expressão'],
+    ['ES'     ,'Expressão Simples'],
+    ['OP'     ,'Operador Aritmético Unário (sinal +, -, ou vazio)'],
+    ['OP2'    ,'Operadores Aritméticos de nível + ou -'],
+    ['OP3'    ,'Operadores Aritméticos de nível *, div, and'],
+    ['R'      ,'Relacional (comparações: =, <, >, etc.)'],
+    ['T'      ,'Termo'],
+    ['F'      ,'Fator'],
+    ['ES*'    ,'Expressão Simples (recursão)'],
+    ['E**'    ,'Continuação da Expressão Relacional (recursão)'],
+    ['T*'     ,'Termo (recursão)'],
+    ['V'      ,'Variável'],
+    ['V*'     ,'Variável (recursão)']
   ];
 
 function analizador_sintatico() {
@@ -505,6 +554,7 @@ function analizador_sintatico() {
         tabela_sintatica[a].push("certo");
         table_container.innerText = "";
     } else {
+
         let error_table = table_content;
         errors_list.forEach(erro => {
             let dados_originais = table_content.find(row => row[0] === erro[0]);
@@ -515,7 +565,6 @@ function analizador_sintatico() {
                 error_table.push([erro[0], erro[1]]);
             }
         });
-    
         const tabela_filtrada = filtrarErrosETriangular(error_table);
         Erros = tabela_filtrada;
     }
@@ -524,12 +573,18 @@ function analizador_sintatico() {
 }
 
 function Tratamento_Erro(errors_list,pilha, token, tipo){
+    var teste = errors_list.filter(
+    e => (e[0] === "Erro" && e[1] === "Erro sintático"));
 
     if (tipo === "SINC"){
          if(pilha[pilha.length - 1] === "ES" && token[0] === ")"){
             errors_list.push([token[0],"Erro na expressão"]);
          }else if(pilha[pilha.length - 1] === "F" && token[0] === ";"){
             errors_list.push(["*","Erro na expressão"]);
+         }else{
+            if (teste.length === 0){
+                errors_list.push(["Erro","Erro sintático"]);
+            }
          }
     }else if(tipo === "ER"){
         if(pilha[pilha.length - 1] === "COND*" && token[0] === "."){
@@ -548,7 +603,12 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push([token[0],`Erro de palavra reservada ${token[0]}`]);
         } else if(pilha[pilha.length - 1] === "C*" && token[0] === "="){
             errors_list.push(["=", "Erro: Atribuicao com operador errado"]);
-
+        } else if(pilha[pilha.length - 1] === "T*" && token[0] === "begin"){
+            errors_list.push([token[0], "Erro: falta \'do\'"]);
+        } else{
+            if (teste.length === 0){
+                errors_list.push(["Erro","Erro sintático"]);
+            }
         }
     }else{
         if (pilha[pilha.length - 1] === ")" && token[0] === "do"){
@@ -557,7 +617,7 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["if", "Erro: falta ("]);
         }else if(pilha[pilha.length - 1] === ")" && token[0] === "then"){
             errors_list.push(["if", "Erro: falta )"]);
-        }else if(pilha[pilha.length - 1] === "do" && token[0] === ")"){
+        }else if(pilha[pilha.length - 1] === "do" && token[0] === ")" && token[1] === "do"){
             errors_list.push(["while", "Erro: falta ("]);
         }else if(pilha[pilha.length - 1] === "." && token[0] === "$"){
             errors_list.push(["end","Erro: falta \" . \""]);
@@ -565,18 +625,343 @@ function Tratamento_Erro(errors_list,pilha, token, tipo){
             errors_list.push(["correto","Erro: falta \" ; \""]);
         } else if(pilha[pilha.length - 1] === ")" && token[0] === ";"){
             errors_list.push([pilha[pilha.length - 1], "Erro na expressão"]);
+        } else if(pilha[pilha.length - 1] === "then" && token[0] === "end"){
+            errors_list.push([token[0], "Erro: falta \'then\'"]);
+        }else{
+            if (teste.length === 0){
+                errors_list.push(["Erro","Erro sintático"]);
+            }
         }
     }
 }
 
-//faltam:
-    //todos de expressao (//4)
+/*
 
+
+
+
+
+
+    Logica da análise Semântica
+
+
+
+
+
+
+
+*/
+
+function analise_semantica(){
+    let code = editor.innerText;
+    let no_comments_code = remove_comments(code);
+    let table_content = generateTableContent(no_comments_code);
+    table_content[0].push(...["Tipo","Valor","Categoria","Escopo","Utilizada"]);
+
+    let variaveis = [];
+    let erros_list = [];
+    let tipoAtual = "";
+    
+    let escopoAtual = "global";
+    let escopos = [escopoAtual]
+
+    for (let i = 1; i < table_content.length; i++) { 
+    let [lexema, token, linha, colIni, colFim] = table_content[i];
+    let proximo = table_content[i+1];
+    let depoisProximo = table_content[i+2];
+    let depoisdepoisProximo = table_content[i+3];
+    let anterior = table_content[i-1];
+
+    if (token === "variable") {
+
+        //  Caso: Declaração de parâmetro de procedimento (exemplo: x: int)
+        if (proximo && proximo[0] === ":" && depoisProximo && (depoisProximo[0] === "int" || depoisProximo[0] === "boolean")) {
+            table_content[i].push(...[depoisProximo[0], "-", "par", escopoAtual, "não"]);
+            variaveis.push(lexema);
+
+        //  Caso: Nome do programa (exemplo: program exemplo)
+        } else if (anterior && anterior[0] === "program") {
+            table_content[i].push(...["-", "-", table_content[i][0], escopoAtual, "-"]);
+
+        //  Caso: Declaração de variável (exemplo: int x, y, z;)
+        } else if((anterior && (anterior[0] === "boolean" || anterior[0] === "int")) || (proximo && proximo[0] === "," || anterior[0] === ",")) {
+
+            if (!variaveis.includes(lexema)){
+                table_content[i].push(...[tipoAtual, "-", "var", escopoAtual, "não"]);
+                variaveis.push(lexema);
+            } else {
+                table_content.push([lexema, "Erro de declaração: Variável já declarada"]);
+            }
+
+        //  Caso: Atribuição de valor (exemplo: x := false;)
+        } else if ((proximo && proximo[0] === ":=") && depoisProximo && (((depoisProximo[0] === "true" || depoisProximo[0] === "false")) || depoisProximo[1] === "integer" || depoisProximo[1] === "operator")) {
+                table_content.find((row) => {
+                    if (row[0] === lexema && (row[5] || row[5] !== "-")){
+                        if (row[5] === "boolean") {
+                            row[9] = "sim";
+                            table_content[i].push(...["-", depoisProximo[0], "-", "-", "-"]);
+                        }else if (row[5] === "int" && depoisProximo[1] === "integer") {
+                            row[9] = "sim";
+                            table_content[i].push(...["-", depoisProximo[0], "-", "-", "-"]);
+                        }else if(row[5] === "int" && depoisProximo[0] === "+"){
+                            row[9] = "sim";
+                            table_content[i].push(...["-", depoisdepoisProximo[0], "-", "-", "-"]);
+                        }
+                        else if(row[5] === "int" && depoisProximo[0] === "-"){
+                            row[9] = "sim";
+                            table_content[i].push(...["-", depoisdepoisProximo[0] * (-1), "-", "-", "-"]);
+                        }
+                    }
+                });
+
+        //  Caso: Outras ocorrências de variável (não identificadas nas condições acima)
+        } else {
+            table_content[i].push("-", "-", "-", "-", "-");
+        }
+
+        //  Caso: Início de um procedimento (exemplo: procedure soma)
+        } else if (lexema === "procedure") {
+            escopoAtual = proximo[0]; // Nome do procedimento vira o novo escopo
+            escopos.push(escopoAtual);
+            table_content[i].push("-", "-", "-", "-", "-");
+
+        //  Caso: Fim de um escopo (end de um procedimento ou bloco)
+        } else if (lexema === "end" && (proximo && proximo[0] !== "else")) {
+            escopos.pop();
+            escopoAtual = escopos[escopos.length - 1];
+            table_content[i].push("-", "-", "-", "-", "-");
+
+        //  Caso: Novo escopo interno de bloco (exemplo: begin dentro de um if ou while)
+        } else if (lexema === "begin" && anterior && (anterior[0] === "do" || anterior[0] === "then")) {
+            escopoAtual = anterior[0] + "_" + linha;  // Nomeia o escopo com base no comando (do/then) e na linha
+            escopos.push(escopoAtual);
+            table_content[i].push("-", "-", "-", "-", "-"); 
+
+        //  Caso: Mudança do tipo atual para declaração de variáveis (exemplo: int ou boolean)
+        } else if((lexema === "int" || lexema === "boolean") && (anterior && anterior[0] !== ":" )){
+            tipoAtual = lexema;
+            table_content[i].push("-", "-", "-", "-", "-"); 
+
+         } else if (reg_int.test(lexema)) {
+            //  Caso: Número inteiro literal
+            table_content[i].push("int", lexema, "literal", "-", "-");
+
+        } else if (lexema === "true" || lexema === "false") {
+            //  Caso: Booleano literal
+            table_content[i].push("boolean", lexema, "literal", "-", "-");
+
+        //  Caso geral (tokens que não alteram tipo, escopo ou variáveis)
+        } else {
+            table_content[i].push("-", "-", "-", "-", "-");   
+        }
+    }
+
+    
+    Tokenss = table_content;
+}       
+
+let CodigoIntermediario = [];
+
+function gerar_codigo_intermediario() {
+    CodigoIntermediario = [["Instrucao", "Argumento"]];
+    CodigoIntermediario.push(["INPP", ""]);
+
+    let mapaVariaveis = {};
+    let memoriaIndex = 0;
+    let rotuloIndex = 0;
+    let procedures = {};
+    let chamadasPendentes = [];
+
+    const gerarRotulo = () => "L" + rotuloIndex++;
+
+    function getEnderecoVariavel(nome) {
+        if (mapaVariaveis[nome] === undefined) {
+            console.warn("Variável não declarada:", nome);
+            return null;
+        }
+        return mapaVariaveis[nome];
+    }
+
+    // Passo 1: Declarar variáveis e procedures
+    for (let i = 1; i < Tokenss.length; i++) {
+        const [lexema, token, , , , , , categoria] = Tokenss[i];
+
+        if (token === "variable" && categoria === "var" && mapaVariaveis[lexema] === undefined) {
+            mapaVariaveis[lexema] = memoriaIndex++;
+            CodigoIntermediario.push(["AMEM", "1"]);
+        }
+
+        if (token === "reserved word procedure") {
+            const nomeProc = Tokenss[i + 1][0];
+            procedures[nomeProc] = gerarRotulo();
+            CodigoIntermediario.push([procedures[nomeProc] + ":", ""]);
+        }
+    }
+
+    // Passo 2: Traduzir comandos
+    for (let i = 1; i < Tokenss.length; i++) {
+        const [lexema, token] = Tokenss[i];
+
+        // --- CHAMADA DE PROCEDURE ---
+        if (token === "variable" && procedures[lexema]) {
+            CodigoIntermediario.push(["CALL", procedures[lexema]]);
+        }
+
+        // --- ATRIBUIÇÃO ---
+        if (token === "variable" && Tokenss[i + 1]?.[0] === ":=") {
+            const varNome = lexema;
+            const varIndex = getEnderecoVariavel(varNome);
+            if (varIndex === null) continue;
+
+            const op1 = Tokenss[i + 2];
+            const operador = Tokenss[i + 3];
+            const op2 = Tokenss[i + 4];
+
+            if (op1[1] === "operator" && op2 && op2[1] === "integer") {
+                const sinal = op1[0];
+                const valor = parseInt(op2[0]);
+                const resultado = sinal === "-" ? -valor : valor;
+                CodigoIntermediario.push(["CRCT", resultado.toString()]);
+                CodigoIntermediario.push(["ARMZ", varIndex.toString()]);
+                continue;
+            }
+
+            if (op1[1] === "integer") {
+                CodigoIntermediario.push(["CRCT", op1[0]]);
+            } else if (op1[1] === "variable") {
+                const end1 = getEnderecoVariavel(op1[0]);
+                if (end1 !== null) CodigoIntermediario.push(["CRVL", end1.toString()]);
+            }
+
+            if (operador && operador[1] === "operator" && op2) {
+                if (op2[1] === "integer") {
+                    CodigoIntermediario.push(["CRCT", op2[0]]);
+                } else if (op2[1] === "variable") {
+                    const end2 = getEnderecoVariavel(op2[0]);
+                    if (end2 !== null) CodigoIntermediario.push(["CRVL", end2.toString()]);
+                }
+
+                switch (operador[0]) {
+                    case "+": CodigoIntermediario.push(["SOMA", ""]); break;
+                    case "-": CodigoIntermediario.push(["SUBT", ""]); break;
+                    case "*": CodigoIntermediario.push(["MULT", ""]); break;
+                    case "div": CodigoIntermediario.push(["DIVI", ""]); break;
+                }
+            }
+
+            CodigoIntermediario.push(["ARMZ", varIndex.toString()]);
+        }
+
+        // --- READ ---
+        if (token === "reserved word read") {
+            const alvo = Tokenss[i + 2];
+            const index = getEnderecoVariavel(alvo[0]);
+            if (index !== null) {
+                CodigoIntermediario.push(["LEIT", ""]);
+                CodigoIntermediario.push(["ARMZ", index.toString()]);
+            }
+        }
+
+        // --- WRITE ---
+        if (token === "reserved word write") {
+            const alvo = Tokenss[i + 2];
+            const index = getEnderecoVariavel(alvo[0]);
+            if (index !== null) {
+                CodigoIntermediario.push(["CRVL", index.toString()]);
+                CodigoIntermediario.push(["IMPR", ""]);
+            }
+        }
+
+        // --- IF ---
+        if (token === "reserved word if") {
+            const op1 = Tokenss[i + 1];
+            const operador = Tokenss[i + 2];
+            const op2 = Tokenss[i + 3];
+
+            const rotuloSenao = gerarRotulo();
+            const rotuloFim = gerarRotulo();
+
+            const end1 = getEnderecoVariavel(op1[0]);
+            if (end1 !== null) CodigoIntermediario.push(["CRVL", end1.toString()]);
+
+            if (op2[1] === "integer") {
+                CodigoIntermediario.push(["CRCT", op2[0]]);
+            } else if (op2[1] === "variable") {
+                const end2 = getEnderecoVariavel(op2[0]);
+                if (end2 !== null) CodigoIntermediario.push(["CRVL", end2.toString()]);
+            }
+
+            switch (operador[0]) {
+                case "=": CodigoIntermediario.push(["CMIG", ""]); break;
+                case "<": CodigoIntermediario.push(["CMME", ""]); break;
+                case ">": CodigoIntermediario.push(["CMMA", ""]); break;
+                case "<>": CodigoIntermediario.push(["CMDG", ""]); break;
+                case "<=" : CodigoIntermediario.push(["CMEG", ""]); break;
+                case ">=" : CodigoIntermediario.push(["CMAG", ""]); break;
+            }
+
+            CodigoIntermediario.push(["DSVF", rotuloSenao]);
+            CodigoIntermediario.push(["DSVS", rotuloFim]);
+            CodigoIntermediario.push([rotuloSenao + ":", ""]);
+            CodigoIntermediario.push([rotuloFim + ":", ""]);
+        }
+
+        // --- WHILE ---
+        if (token === "reserved word while") {
+            const rotuloInicio = gerarRotulo();
+            const rotuloFim = gerarRotulo();
+
+            const op1 = Tokenss[i + 1];
+            const operador = Tokenss[i + 2];
+            const op2 = Tokenss[i + 3];
+
+            CodigoIntermediario.push([rotuloInicio + ":", ""]);
+
+            const end1 = getEnderecoVariavel(op1[0]);
+            if (end1 !== null) CodigoIntermediario.push(["CRVL", end1.toString()]);
+
+            if (op2[1] === "integer") {
+                CodigoIntermediario.push(["CRCT", op2[0]]);
+            } else if (op2[1] === "variable") {
+                const end2 = getEnderecoVariavel(op2[0]);
+                if (end2 !== null) CodigoIntermediario.push(["CRVL", end2.toString()]);
+            }
+
+            switch (operador[0]) {
+                case "=": CodigoIntermediario.push(["CMIG", ""]); break;
+                case "<": CodigoIntermediario.push(["CMME", ""]); break;
+                case ">": CodigoIntermediario.push(["CMMA", ""]); break;
+            }
+
+            CodigoIntermediario.push(["DSVF", rotuloFim]);
+            // Corpo do while seria aqui
+            CodigoIntermediario.push(["DSVS", rotuloInicio]);
+            CodigoIntermediario.push([rotuloFim + ":", ""]);
+        }
+
+        // --- NOT, AND, OR --- (lógica booleana)
+        if (token === "reserved word not") {
+            CodigoIntermediario.push(["NEGA", ""]);
+        }
+
+        if (token === "reserved word and") {
+            CodigoIntermediario.push(["CONJ", ""]);
+        }
+
+        if (token === "reserved word or") {
+            CodigoIntermediario.push(["DISJ", ""]);
+        }
+    }
+
+    CodigoIntermediario.push(["PARA", ""]);
+}
 
 function Compilar(){
     table_container.innerText = "";
     analizador_lexico();
     analizador_sintatico();
+    analise_semantica();
+    gerar_codigo_intermediario();
 
     if(errors_list == ""){
         alert("Compilado sem erros");
@@ -584,3 +969,94 @@ function Compilar(){
         alert("Error");
     }
 }
+
+// function interpretar_codigo(codigo) {
+//     let memoria = [];
+//     let pilha = [];
+//     let output = [];
+
+//     let instrucoes = codigo.slice(1); // Remove cabeçalho da tabela
+
+//     let ip = 0; // Instruction pointer
+
+//     function input_simulado() {
+//         // Pode trocar por `prompt("Digite um valor:")`
+//         return parseInt(prompt("Digite um número inteiro:"), 10);
+//     }
+
+//     while (ip < instrucoes.length) {
+//         const [instrucao, argumento] = instrucoes[ip];
+
+//         switch (instrucao) {
+//             case "INPP":
+//                 memoria = [];
+//                 pilha = [];
+//                 break;
+
+//             case "INTEGER":
+//                 break; // só decorativo no código intermediário
+
+//             case "AMEM":
+//                 const tam = parseInt(argumento);
+//                 for (let i = 0; i < tam; i++) {
+//                     memoria.push(0);
+//                 }
+//                 break;
+
+//             case "LEIT":
+//                 const valor = input_simulado();
+//                 pilha.push(valor);
+//                 break;
+
+//             case "CRCT":
+//                 pilha.push(parseInt(argumento));
+//                 break;
+
+//             case "CRVL":
+//                 pilha.push(memoria[parseInt(argumento)]);
+//                 break;
+
+//             case "ARMZ":
+//                 const idx = parseInt(argumento);
+//                 memoria[idx] = pilha.pop();
+//                 break;
+
+//             case "MULT":
+//                 const op2 = pilha.pop();
+//                 const op1 = pilha.pop();
+//                 pilha.push(op1 * op2);
+//                 break;
+
+//             case "SOMA":
+//                 pilha.push(pilha.pop() + pilha.pop());
+//                 break;
+
+//             case "SUBT":
+//                 const b = pilha.pop();
+//                 const a = pilha.pop();
+//                 pilha.push(a - b);
+//                 break;
+
+//             case "IMPR":
+//                 output.push(pilha.pop());
+//                 break;
+
+//             case "PARA":
+//                 ip = instrucoes.length; // força parar
+//                 break;
+//         }
+
+//         ip++;
+//     }
+
+//     alert("Saída: " + output.join(", "));
+//     return output;
+// }
+
+// document.getElementById("interpretar_btn").addEventListener("click", function() {
+//     if (CodigoIntermediario.length === 0) {
+//         alert("Código intermediário não gerado.");
+//         return;
+//     }
+//     interpretar_codigo(CodigoIntermediario);
+// });
