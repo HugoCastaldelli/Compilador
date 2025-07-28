@@ -970,93 +970,93 @@ function Compilar(){
     }
 }
 
-// function interpretar_codigo(codigo) {
-//     let memoria = [];
-//     let pilha = [];
-//     let output = [];
+function interpretar_codigo(codigo) {
+    let memoria = [];
+    let pilha = [];
+    let output = [];
 
-//     let instrucoes = codigo.slice(1); // Remove cabeçalho da tabela
+    let instrucoes = codigo.slice(1); // Remove cabeçalho da tabela
 
-//     let ip = 0; // Instruction pointer
+    let ip = 0; // Instruction pointer
 
-//     function input_simulado() {
-//         // Pode trocar por `prompt("Digite um valor:")`
-//         return parseInt(prompt("Digite um número inteiro:"), 10);
-//     }
+    function input_simulado() {
+        // Pode trocar por `prompt("Digite um valor:")`
+        return parseInt(prompt("Digite um número inteiro:"), 10);
+    }
 
-//     while (ip < instrucoes.length) {
-//         const [instrucao, argumento] = instrucoes[ip];
+    while (ip < instrucoes.length) {
+        const [instrucao, argumento] = instrucoes[ip];
 
-//         switch (instrucao) {
-//             case "INPP":
-//                 memoria = [];
-//                 pilha = [];
-//                 break;
+        switch (instrucao) {
+            case "INPP":
+                memoria = [];
+                pilha = [];
+                break;
 
-//             case "INTEGER":
-//                 break; // só decorativo no código intermediário
+            case "INTEGER":
+                break; // só decorativo no código intermediário
 
-//             case "AMEM":
-//                 const tam = parseInt(argumento);
-//                 for (let i = 0; i < tam; i++) {
-//                     memoria.push(0);
-//                 }
-//                 break;
+            case "AMEM":
+                const tam = parseInt(argumento);
+                for (let i = 0; i < tam; i++) {
+                    memoria.push(0);
+                }
+                break;
 
-//             case "LEIT":
-//                 const valor = input_simulado();
-//                 pilha.push(valor);
-//                 break;
+            case "LEIT":
+                const valor = input_simulado();
+                pilha.push(valor);
+                break;
 
-//             case "CRCT":
-//                 pilha.push(parseInt(argumento));
-//                 break;
+            case "CRCT":
+                pilha.push(parseInt(argumento));
+                break;
 
-//             case "CRVL":
-//                 pilha.push(memoria[parseInt(argumento)]);
-//                 break;
+            case "CRVL":
+                pilha.push(memoria[parseInt(argumento)]);
+                break;
 
-//             case "ARMZ":
-//                 const idx = parseInt(argumento);
-//                 memoria[idx] = pilha.pop();
-//                 break;
+            case "ARMZ":
+                const idx = parseInt(argumento);
+                memoria[idx] = pilha.pop();
+                break;
 
-//             case "MULT":
-//                 const op2 = pilha.pop();
-//                 const op1 = pilha.pop();
-//                 pilha.push(op1 * op2);
-//                 break;
+            case "MULT":
+                const op2 = pilha.pop();
+                const op1 = pilha.pop();
+                pilha.push(op1 * op2);
+                break;
 
-//             case "SOMA":
-//                 pilha.push(pilha.pop() + pilha.pop());
-//                 break;
+            case "SOMA":
+                pilha.push(pilha.pop() + pilha.pop());
+                break;
 
-//             case "SUBT":
-//                 const b = pilha.pop();
-//                 const a = pilha.pop();
-//                 pilha.push(a - b);
-//                 break;
+            case "SUBT":
+                const b = pilha.pop();
+                const a = pilha.pop();
+                pilha.push(a - b);
+                break;
 
-//             case "IMPR":
-//                 output.push(pilha.pop());
-//                 break;
+            case "IMPR":
+                output.push(pilha.pop());
+                break;
 
-//             case "PARA":
-//                 ip = instrucoes.length; // força parar
-//                 break;
-//         }
+            case "PARA":
+                ip = instrucoes.length; // força parar
+                break;
+        }
 
-//         ip++;
-//     }
+        ip++;
+    }
 
-//     alert("Saída: " + output.join(", "));
-//     return output;
-// }
+    alert("Saída: " + output.join(", "));
+    return output;
+}
 
-// document.getElementById("interpretar_btn").addEventListener("click", function() {
-//     if (CodigoIntermediario.length === 0) {
-//         alert("Código intermediário não gerado.");
-//         return;
-//     }
-//     interpretar_codigo(CodigoIntermediario);
-// });
+document.getElementById("interpretar_btn").addEventListener("click", function() {
+    if (CodigoIntermediario.length === 0) {
+        alert("Código intermediário não gerado.");
+        return;
+    }
+    interpretar_codigo(CodigoIntermediario);
+});
